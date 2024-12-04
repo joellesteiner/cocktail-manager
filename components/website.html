@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="css/Website view">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drink Collection Manager</title>
+</head>
+<body>
+<header>
+    <h1>The Drink Collection Manager</h1>
+    <p>Organize and manage your favorite drinks easily!</p>
+</header>
+
+<main>
+    <section id="csv-upload">
+        <h2>Upload Drinks from CSV</h2>
+        <input type="file" id="csv-file" accept=".csv">
+        <button id="upload-csv">Upload and Populate</button>
+    </section>
+
+    <!-- Drink List Section -->
+    <section id="drink-list">
+        <h2>Your Drink Collection</h2>
+        <div class="drink-card">
+            <img src="placeholder.jpg" alt="Drink Image">
+            <h3>Drink Name</h3>
+            <p>Description of the drink.</p>
+        </div>
+    </section>
+
+    <!-- Add Drink Section -->
+    <section id="add-drink">
+        <h2>Add a New Drink</h2>
+        <form id="drink-form">
+            <!-- Drink Name -->
+            <label for="drink-name">Drink Name:</label>
+            <input type="text" id="drink-name" name="drink-name" required>
+
+            <!-- Drink Category -->
+            <label for="drink-category">Category:</label>
+            <select id="drink-category" name="drink-category" required>
+                <option value="" disabled selected>Select a category</option>
+                <option value="cocktail">Cocktail</option>
+                <option value="mocktail">Mocktail</option>
+                <option value="soft-drink">Soft Drink</option>
+                <option value="coffee-tea">Coffee / Tea</option>
+                <option value="smoothie-juice">Smoothie / Juice</option>
+                <option value="hot-chocolate">Hot Chocolate</option>
+            </select>
+
+            <!-- Ingredients -->
+            <label for="drink-ingredients">Ingredients (comma-separated):</label>
+            <textarea id="drink-ingredients" name="drink-ingredients" required></textarea>
+
+            <!-- Steps -->
+            <label for="drink-steps">Steps:</label>
+            <textarea id="drink-steps" name="drink-steps" required></textarea>
+
+            <!-- Glass Type -->
+            <label for="drink-glass">Glass Type:</label>
+            <input type="text" id="drink-glass" name="drink-glass" required>
+
+            <!-- Alcohol Content -->
+            <label for="drink-alcohol-content">Alcohol Content (%):</label>
+            <input type="number" id="drink-alcohol-content" name="drink-alcohol-content" min="0" max="100" required>
+
+            <!-- Image URL -->
+            <label for="drink-image">Image URL:</label>
+            <input type="url" id="drink-image" name="drink-image">
+
+            <!-- Submit Button -->
+            <button type="submit">Add Drink</button>
+        </form>
+    </section>
+</main>
+
+<footer>
+    <p>&copy; 2024 Drink Collection Manager. All rights reserved.</p>
+</footer>
+</body>
+</html>
