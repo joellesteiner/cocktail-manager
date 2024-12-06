@@ -10,9 +10,7 @@ class Drink{
     }
 }
 
-new Drink("Mojito", "cocktail", ["mint", "rum", "soda water", "lime"], "glass", 12){
-
-}
+new Drink("Mojito", "cocktail", ["mint", "rum", "soda water", "lime"], "glass", 12);
 
 // DrinkManager Class
 class DrinkManager{

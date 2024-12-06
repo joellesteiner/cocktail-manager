@@ -1,1 +1,1 @@
-{"drinks":[{"id":1,"name":"Mojito","category":"Cocktail","ingredients":"Rum, Sugar, Lime, Mint","glass":"Highball","alcoholContent":15},{"id":2,"name":"Lemonade","category":"Soft Drink","ingredients":"Lemon, Sugar, Water","glass":"Tumbler","alcoholContent":0},{},{"id":2,"name":"beer","category":"Cocktail","ingredients":"Rum, Sugar, Lime, Mint","glass":"Highball","alcoholContent":15}]}
+{"drinks":[{"id":1,"name":"Mojito","category":"Cocktail","ingredients":"Rum, Sugar, Lime, Mint","glass":"Highball","alcoholContent":15},{}]}
