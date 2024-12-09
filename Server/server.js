@@ -1,15 +1,13 @@
 // app.js
 import express from 'express';
 const app = express();
-const port = 3000;
+const port = 3001;
 
 import path from 'path';
 import DrinkManager from './drinkForm.js';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-const drinkManager = new DrinkManager();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -44,22 +42,48 @@ app.post('/api/drinks', (req , res) => {
 
 app.delete('/api/drinks/:id', (req , res) => {
     const filePath = path.join(__dirname, 'drinks.json');
-    const fileData = JSON.parse(readFileSync(filePath, 'utf8'));
-    const { id } = req.body;
-    const filteredDrinks = fileData.drinks.filter(drink => drink.id !== id);
-    writeFileSync(filePath, JSON.stringify({ drinks: filteredDrinks }), 'utf8');
-    res.status(200).json({ message: 'Drink deleted successfully', drinks: filteredDrinks });
+    const id = req.params.id;
+
+    try {
+        const fileData = JSON.parse(readFileSync(filePath, 'utf8'));
+        const filteredDrinks = fileData.drinks.filter(drink => drink.id !== id);
+
+        if (filteredDrinks.length === fileData.drinks.length) {
+            return res.status(404).json({message: 'Drink not found'});
+        }
+
+        writeFileSync(filePath, JSON.stringify({drinks: filteredDrinks}), 'utf8');
+        res.status(200).json({ message: 'Drink deleted successfully', drinks: filteredDrinks });
+    } catch (error) {
+        res.status(500).json({ message: ' Server error', error: error.message });
+    }
 })
 
 app.put('/api/drinks/:id', (req , res) => {
     const filePath = path.join(__dirname, 'drinks.json');
-    const fileData = JSON.parse(readFileSync(filePath, 'utf8'))
-    const { id, name, category, ingredients, glass, alcoholContent } = req.body;
-    const drinkIndex = fileData.drinks.findIndex(drink => drink.id === id);
-    fileData.drinks[drinkIndex] = { id, name, category, ingredients, glass, alcoholContent };
-    writeFileSync(filePath, JSON.stringify(fileData), 'utf8');
+    const id = req.params.id;
 
-})
+    try {
+    const fileData = JSON.parse(readFileSync(filePath, 'utf8'))
+    const drinkIndex = fileData.drinks.findIndex(drink => drink.id === id);
+
+    if (drinkIndex === -1 ) {
+        return res.status(404).json({message: 'Drink not found'});
+    }
+
+    const {name, category, ingredients, glass, alcoholContent} = req.body;
+
+    if (!name || !category || !ingredients || !glass || !alcoholContent) {
+            return res.status(400).json({message: 'Missing required fields'});
+    }
+        fileData.drinks[drinkIndex] = { id, name, category, ingredients, glass, alcoholContent };
+        writeFileSync(filePath, JSON.stringify(fileData), 'utf8');
+        res.status(200).json({ message: 'Drink updated successfully', drinks: fileData.drinks });
+    } catch(error){
+            res.status(500).json({ message: 'Internal server error', error: error.message });
+        }
+
+});
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
