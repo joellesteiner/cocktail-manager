@@ -1,7 +1,6 @@
-// app.js
 import express from 'express';
 const app = express();
-const port = 3001;
+const port = 3000;
 
 import path from 'path';
 import DrinkManager from './drinkForm.js';
@@ -11,8 +10,13 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-
 app.use(express.json());
+
+app.use((req, res, next) => {
+    console.log(`[${req.method}] ${req.path} Received request`);
+    next();
+});
+
 
 app.get('/api/drinks', (req, res) => {
     const filePath = path.join(__dirname, 'drinks.json');
@@ -21,6 +25,21 @@ app.get('/api/drinks', (req, res) => {
     const myData = JSON.parse(readFileSync(filePath, 'utf8'))
 
     res.json(myData)
+});
+
+app.get('/api/drinks/:id', (req, res) => {
+    const filePath = path.join(__dirname, 'drinks.json');
+    const id = req.params.id;
+    console.log(filePath)
+    const myData = JSON.parse(readFileSync(filePath, 'utf8'));
+
+    const filteredDrinks = myData.drinks.filter(drink => drink.id === id);
+
+    if (filteredDrinks.length === 0 ) {
+        return res.status(404).json({message: 'Drink not found'});
+    }
+
+    res.status(200).json(filteredDrinks[0])
 });
 
 app.post('/api/drinks', (req , res) => {
