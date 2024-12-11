@@ -3,10 +3,12 @@ const app = express();
 const port = 3000;
 
 import path from 'path';
-import DrinkManager from './drinkForm.js';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { Drink, DrinksManager } from './drinkForm.js';
+import { v4 as uuidv4 } from 'uuid';
+
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -17,7 +19,12 @@ app.use((req, res, next) => {
     next();
 });
 
-
+/* GEcd/ api / drinks
+- Should perform these checks
+      - Make sure there's drinks in the file
+      - Make sure that the file is the drinks.json file
+      - JSON parsing errors
+*/
 app.get('/api/drinks', (req, res) => {
     const filePath = path.join(__dirname, 'drinks.json');
     console.log(filePath)
@@ -26,6 +33,18 @@ app.get('/api/drinks', (req, res) => {
 
     res.json(myData)
 });
+
+/* GET/ api / drinks/ id
+
+- Should get list of specified drink in file
+- Should perform these checks
+       - Make sure that the ID exists
+       - ID only contains numbers
+       - JSON parsing error
+       - JSON has unexpected structure
+       - Allergen safety warning ?
+
+ */
 
 app.get('/api/drinks/:id', (req, res) => {
     const filePath = path.join(__dirname, 'drinks.json');
@@ -42,22 +61,49 @@ app.get('/api/drinks/:id', (req, res) => {
     res.status(200).json(filteredDrinks[0])
 });
 
+/* POST /api/drinks
+
+- Should get list of specified drink in file
+- Maybe bulk drinks should be created at the same time (other POST apis), if one is invalid post all except the one
+- Should perform these checks :
+      - Alcohol content doesn't exceed 100 DONE
+      - None of the inputs can be empty DONE
+      - Category can only be Cocktail, Mocktail or other DONE
+      - Convert all characters in inputs into lowercase/uppercase automatically DONE
+      - Duplicate drinks and ingredients
+      - Alcohol is a double or int and nothing else
+      - Bulk of invalid data in object
+      - Unfinished request body with missing variables
+      - Name, ingredients have limited number of characters
+      - Body of object is too large , too many variables
+      - All Cocktails should have more than 1 percent alcohol
+      - All Mocktails should have 0 as alcohol content
+      - Permission check ?
+      - Limit on the amount of created drinks
+ */
+
+const drinksManager = new DrinksManager();
+
 app.post('/api/drinks', (req , res) => {
-    const filePath = path.join(__dirname, 'drinks.json');
-    const fileData = JSON.parse(readFileSync(filePath, 'utf8'))
-    const { name, category, ingredients, glass, alcoholContent } = req.body;
-    const newDrink = {
-        id: `${Date.now()}`, // Use timestamp as a unique ID
-        name,
-        category,
-        ingredients,
-        glass,
-        alcoholContent
-    };
-    fileData.drinks.push(newDrink);
-    writeFileSync(filePath, JSON.stringify(fileData), 'utf8');
-    res.status(201).json(newDrink);
-})
+    console.log(req.body.category);
+    const drink = new Drink (req.body.name , req.body.category, req.body.ingredients, req.body.glass, req.body.alcoholContent)
+    drink.id = uuidv4();
+    drinksManager.addDrink(drink)
+    res.status(200).json({ id: drink.id, message: "Drink added successfully!" });
+});
+
+/* DELETE/ api / drinks
+
+- Should get delete of specified drink in file
+- Maybe should include an api that deletes all drinks in the JSON file
+
+- Make sure that the ID exists
+- Make sure that it's valid ID (all numbers)
+- Parse error
+- Check if someone wants to delete the last drink in the file
+- Permission check ?
+
+ */
 
 app.delete('/api/drinks/:id', (req , res) => {
     const filePath = path.join(__dirname, 'drinks.json');
@@ -77,6 +123,28 @@ app.delete('/api/drinks/:id', (req , res) => {
         res.status(500).json({ message: ' Server error', error: error.message });
     }
 })
+
+/* PUT/ api / drinks
+
+- Should be able to edit drinks in a file
+- Maybe should include an api bulk edits based on id & category selection, if one is invalid change all except the one
+
+- Make sure that the ID exists or isn't missing
+- Make sure ID consists of number only
+- What happens when there is an empty request body ?
+- Invalid or missing fields
+- Ingredients has to be an array of strings , so there needs to be a check for this
+- Alcohol content can't exceed 100
+- Inputs for the other fields must be valid in terms of value type
+- Must not allow duplicate ingredients
+- Converts all string input into lowercase
+- All Cocktails should have more than 1 percent alcohol
+- All Mocktails should have 0 as alcohol content
+- Request body is too large
+- Permission check ?
+- Allergen safety warning ?
+
+ */
 
 app.put('/api/drinks/:id', (req , res) => {
     const filePath = path.join(__dirname, 'drinks.json');

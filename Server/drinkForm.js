@@ -1,26 +1,57 @@
-// Drink Class
-class Drink{
+import path from "path";
+import {readFileSync, writeFileSync} from "node:fs";
+import {fileURLToPath} from "node:url";
+import { dirname } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+
+export class Drink {
+
     constructor(name, category, ingredients, glass, alcoholContent = null) {
-        this.name = name;
-        this.category = category;
+        this.name = name.trim().toLowerCase();
+        if (typeof category !== 'string') {
+            throw new Error("Category must be a string");
+        }
+        this.category = category.trim().toLowerCase();
         this.ingredients = ingredients;
         this.glass = glass;
         this.alcoholContent = alcoholContent;
 
+        const validCategories = ["cocktail", "mocktail", "other"];
+        if (!validCategories.includes(category)) {
+            throw new Error("Invalid category.Please choose from cocktail, mocktail or other.")
+        }
+
+        if(typeof this.name !== "string") {
+            throw new Error("Invalid name.")
+        }
+
+        if(!Array.isArray(ingredients) || this.ingredients.length === 0) {
+            throw new Error("Invalid ingredients.");
+        }
+
+        if (typeof this.alcoholContent !== "number" || this.alcoholContent < 0 || this.alcoholContent > 100){
+            throw new Error("Invalid, Alcohol content must be a number between 0 - 100");
+        }
+
     }
+
 }
 
-new Drink("Mojito", "cocktail", ["mint", "rum", "soda water", "lime"], "glass", 12);
-
 // DrinkManager Class
-class DrinkManager{
+export class DrinksManager{
     constructor() {
-        this.drinks = [] // An empty array to store drink objects
-    }
 
-// Add a new drink
-    addDrink(drink){
-        this.drinks.push(drink)
+    this.filePath = path.join(__dirname, "drinks.json");
+
+}
+    addDrink(Drink){
+
+        const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'))
+        fileData.drinks.push(Drink);
+        writeFileSync(this.filePath, JSON.stringify(fileData), 'utf8');
+
     }
 
     // Remove a drink by name
@@ -43,12 +74,4 @@ class DrinkManager{
 
 
 }
-const mojito = new Drink("Mojito", "Cocktail", ["Rum", "Mint","Sugar"], "Mix all ingredients.", "Highball glass", 15.0
-);
-
-const manager = new DrinkManager(); // Create a manager
-
-
-manager.addDrink(mojito);
-console.log(manager.listDrinks());
 
