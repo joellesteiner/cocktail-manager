@@ -1,7 +1,4 @@
 import express from 'express';
-const app = express();
-const port = 3000;
-
 import path from 'path';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
@@ -9,7 +6,8 @@ import { fileURLToPath } from 'node:url';
 import { Drink, DrinksManager } from './drinkForm.js';
 import { v4 as uuidv4 } from 'uuid';
 
-
+const app = express();
+const port = 3000;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 app.use(express.json());
@@ -18,6 +16,23 @@ app.use((req, res, next) => {
     console.log(`[${req.method}] ${req.path} Received request`);
     next();
 });
+const readJSONFile = (filePath) => {
+    try {
+        const data = readFileSync(filePath, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        throw new Error("Error reading or parsing JSON data");
+    }
+};
+
+const writeJSONFile = (filePath, data) => {
+    try {
+        writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+    } catch (error) {
+        throw new Error("Error writing data to JSON file");
+    }
+};
+
 
 /* GEcd/ api / drinks
 - Should perform these checks
@@ -27,11 +42,18 @@ app.use((req, res, next) => {
 */
 app.get('/api/drinks', (req, res) => {
     const filePath = path.join(__dirname, 'drinks.json');
-    console.log(filePath)
+    try{
+        const myData = JSON.parse(readFileSync(filePath, 'utf8'))
+        res.json(myData)
+    } catch (error){
+        console.error(error);
+        res.status(500).json({message: "Error reading drinks data"})
+    }
 
-    const myData = JSON.parse(readFileSync(filePath, 'utf8'))
-
-    res.json(myData)
+    res.json([
+        { name: 'Mojito', category: 'Cocktail', ingredients: ['mint', 'lime', 'rum'] },
+        { name: 'Virgin Mojito', category: 'Mocktail', ingredients: ['mint', 'lime', 'soda'] },
+    ]);
 });
 
 /* GET/ api / drinks/ id
@@ -49,16 +71,20 @@ app.get('/api/drinks', (req, res) => {
 app.get('/api/drinks/:id', (req, res) => {
     const filePath = path.join(__dirname, 'drinks.json');
     const id = req.params.id;
-    console.log(filePath)
-    const myData = JSON.parse(readFileSync(filePath, 'utf8'));
 
-    const filteredDrinks = myData.drinks.filter(drink => drink.id === id);
+    try {
+        const myData = readJSONFile(filePath);
+        const drink = myData.drinks.find(drink => drink.id === id);
 
-    if (filteredDrinks.length === 0 ) {
-        return res.status(404).json({message: 'Drink not found'});
+        if (!drink) {
+            return res.status(404).json({message: 'Drink not found'});
+        }
+
+        res.status(200).json(filteredDrinks[0])
+    } catch (error) {
+        console.error("Error retrieving drink by ID:", error)
+        res.status(500).json({message: "Error retrieving drink by ID:", error})
     }
-
-    res.status(200).json(filteredDrinks[0])
 });
 
 /* POST /api/drinks
@@ -85,12 +111,19 @@ app.get('/api/drinks/:id', (req, res) => {
 const drinksManager = new DrinksManager();
 
 app.post('/api/drinks', (req , res) => {
-    console.log(req.body.category);
-    const drink = new Drink (req.body.name , req.body.category, req.body.ingredients, req.body.glass, req.body.alcoholContent)
-    drink.id = uuidv4();
-    drinksManager.addDrink(drink)
-    res.status(200).json({ id: drink.id, message: "Drink added successfully!" });
-});
+    try {
+        const drink = new Drink (req.body.name , req.body.category, req.body.ingredients, req.body.glass, req.body.alcoholContent)
+        drink.id = uuidv4();
+
+        drinksManager.addDrink(drink)
+        res.status(200).json({ id: drink.id, message: "Drink added successfully!" });
+    } catch (error) {
+        console.error("Error adding drink:", error);
+        res.status(400).json({ message: error.message });
+
+    }
+
+    });
 
 /* DELETE/ api / drinks
 
@@ -117,7 +150,7 @@ app.delete('/api/drinks/:id', (req , res) => {
             return res.status(404).json({message: 'Drink not found'});
         }
 
-        writeFileSync(filePath, JSON.stringify({drinks: filteredDrinks}), 'utf8');
+        writeJSONFile(filePath, { drinks: updatedDrinks });
         res.status(200).json({ message: 'Drink deleted successfully', drinks: filteredDrinks });
     } catch (error) {
         res.status(500).json({ message: ' Server error', error: error.message });
@@ -130,7 +163,6 @@ app.delete('/api/drinks/:id', (req , res) => {
 - Maybe should include an api bulk edits based on id & category selection, if one is invalid change all except the one
 
 - Make sure that the ID exists or isn't missing
-- Make sure ID consists of number only
 - What happens when there is an empty request body ?
 - Invalid or missing fields
 - Ingredients has to be an array of strings , so there needs to be a check for this
@@ -157,8 +189,6 @@ app.put('/api/drinks/:id', (req , res) => {
     if (drinkIndex === -1 ) {
         return res.status(404).json({message: 'Drink not found'});
     }
-
-    const {name, category, ingredients, glass, alcoholContent} = req.body;
 
     if (!name || !category || !ingredients || !glass || !alcoholContent) {
             return res.status(400).json({message: 'Missing required fields'});

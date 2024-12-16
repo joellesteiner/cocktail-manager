@@ -39,7 +39,6 @@ export class Drink {
 
 }
 
-// DrinkManager Class
 export class DrinksManager{
     constructor() {
 
@@ -49,29 +48,16 @@ export class DrinksManager{
     addDrink(Drink){
 
         const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'))
+
+        const existingDrink = fileData.drinks.find(drink => drink.name === Drink.name);
+
+        if (existingDrink) {
+            throw new Error("Drink already exists.");
+        }
         fileData.drinks.push(Drink);
         writeFileSync(this.filePath, JSON.stringify(fileData), 'utf8');
 
     }
-
-    // Remove a drink by name
-    removeDrink(name) {
-        this.drinks = this.drinks.filter(drink => drink.name !== name);
-    }
-
-    editDrink(name, updatedDrink) {
-        const index = this.drinks.findIndex(drink => drink.name === name);
-        if (index !== -1) this.drinks[index] = updatedDrink;
-    }
-
-    filterByCategory(category) {
-        return this.drinks.filter(drink => drink.category === category);
-    }
-
-    listDrinks() {
-        return this.drinks; //Returns the entire array of drinks
-    }
-
 
 }
 
