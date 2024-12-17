@@ -108,8 +108,14 @@ export class DrinksManager{
 
     getAllDrinks() {
         try{
-            
+            const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'));
+            return fileData.drinks;
+
         }
+        catch (error) {
+            throw new Error('Error retrieving the drinks list: ' + error.message);
+        }
+
 
     }
 
@@ -124,7 +130,7 @@ export class DrinksManager{
         }
         try {
             const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'))
-            const drinkIndex = fileData.drinks.findIndex(Drink => Drink.id !== id);
+            const drinkIndex = fileData.drinks.findIndex(drink => drink.id === id);
 
             if (drinkIndex === -1) {
                 return null ;
@@ -140,24 +146,23 @@ export class DrinksManager{
 
         }
 
-
-
     }
-    addDrink(Drink){
+    addDrink(newDrink) {
+        const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'));
 
-        const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'))
-        if (this.findDuplicate(Drink)) {
-            throw new Error("Drink already exists in this category.");
+        if (this.findDuplicate(newDrink)) {
+            throw new Error('Drink already exists in this category.');
         }
 
-        fileData.drinks.push(Drink);
+        fileData.drinks.push(newDrink);
+
         writeFileSync(this.filePath, JSON.stringify(fileData, null, 2), 'utf8');
 
-        this.CategoryManager.assignDrinkToCategory(Drink, Drink.category);
-
+        this.CategoryManager.assignDrinkToCategory(newDrink, newDrink.category);
     }
+
     findDuplicate(drink) {
-        return drink.some(existingDrink =>
+        return this.getAllDrinks().some(existingDrink =>
             existingDrink.name.toLowerCase().trim() === drink.name.toLowerCase().trim() &&
             existingDrink.category.toLowerCase().trim() === drink.category.toLowerCase().trim()
         );
