@@ -3,7 +3,7 @@ import path from 'path';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Drink, DrinksManager } from './drinkForm.js';
+import { Drink, DrinksManager, CategoryManager } from './drinkForm.js';
 import { v4 as uuidv4 } from 'uuid';
 
 const app = express();
@@ -25,16 +25,8 @@ const readJSONFile = (filePath) => {
     }
 };
 
-const writeJSONFile = (filePath, data) => {
-    try {
-        writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
-    } catch (error) {
-        throw new Error("Error writing data to JSON file");
-    }
-};
 
-
-/* GEcd/ api / drinks
+/* GET/ api / drinks
 - Should perform these checks
       - Make sure there's drinks in the file
       - Make sure that the file is the drinks.json file
@@ -42,8 +34,12 @@ const writeJSONFile = (filePath, data) => {
 */
 app.get('/api/drinks', (req, res) => {
     const filePath = path.join(__dirname, 'drinks.json');
+
     try{
         const myData = JSON.parse(readFileSync(filePath, 'utf8'))
+        if (!myData || !myData.drinks || myData.drinks.length === 0) {
+            return res.status(404).json({ message: "No drinks found" });
+        }
         res.json(myData)
     } catch (error){
         console.error(error);
@@ -68,6 +64,19 @@ app.get('/api/drinks', (req, res) => {
 
  */
 
+app.get('api/drinks/:category', (req,res) => {
+
+    }
+
+
+
+
+
+)
+
+
+
+
 app.get('/api/drinks/:id', (req, res) => {
     const filePath = path.join(__dirname, 'drinks.json');
     const id = req.params.id;
@@ -80,7 +89,12 @@ app.get('/api/drinks/:id', (req, res) => {
             return res.status(404).json({message: 'Drink not found'});
         }
 
-        res.status(200).json(filteredDrinks[0])
+        if (drink.allergens.length > 0) {
+            return res.status(200).json({ allergens: drink.allergens });
+        } else {
+            return res.status(200).json({ message: 'No allergens listed for this drink.' });
+        }
+
     } catch (error) {
         console.error("Error retrieving drink by ID:", error)
         res.status(500).json({message: "Error retrieving drink by ID:", error})
@@ -108,20 +122,40 @@ app.get('/api/drinks/:id', (req, res) => {
       - Limit on the amount of created drinks
  */
 
-const drinksManager = new DrinksManager();
-
 app.post('/api/drinks', (req , res) => {
-    try {
-        const drink = new Drink (req.body.name , req.body.category, req.body.ingredients, req.body.glass, req.body.alcoholContent)
-        drink.id = uuidv4();
+    const { name, category, ingredients, glass, alcoholContent, allergens } = req.body;
 
-        drinksManager.addDrink(drink)
-        res.status(200).json({ id: drink.id, message: "Drink added successfully!" });
-    } catch (error) {
+    if (!name || !category || !ingredients || !glass || alcoholContent === undefined || allergens === undefined) {
+        return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    if (!Array.isArray(ingredients) || ingredients.some(i => typeof i !== 'string')) {
+        return res.status(400).json({ message: 'Ingredients must be an array of strings' });
+    }
+
+    const validCategories = ["cocktail", "mocktail", "other"];
+    if (!validCategories.includes(category.toLowerCase())) {
+        return res.status(400).json({ message: 'Invalid category. Please choose from cocktail, mocktail, or other.' });
+    }
+    const newDrink = new Drink(name, category, ingredients, glass, alcoholContent);
+    newDrink.id = uuidv4();
+    try {
+        const drinksManager = new DrinksManager();
+
+        if (drinksManager.findDuplicate(newDrink)) {
+            return res.status(400).json({ message: "Drink already exists in this category." });
+        }
+
+        drinksManager.addDrink(newDrink);
+        res.status(200).json({ id: newDrink.id, message: "Drink added successfully!" });
+    }
+
+    catch (error) {
         console.error("Error adding drink:", error);
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: "Error adding drink", error: error.message });
 
     }
+
 
     });
 
@@ -139,46 +173,28 @@ app.post('/api/drinks', (req , res) => {
  */
 
 app.delete('/api/drinks/:id', (req , res) => {
-    const filePath = path.join(__dirname, 'drinks.json');
-    const id = req.params.id;
+        const id = req.params.id;
 
-    try {
-        const fileData = JSON.parse(readFileSync(filePath, 'utf8'));
-        const filteredDrinks = fileData.drinks.filter(drink => drink.id !== id);
+        try {
+            const drinkManager = new DrinksManager()
 
-        if (filteredDrinks.length === fileData.drinks.length) {
-            return res.status(404).json({message: 'Drink not found'});
+            drinkManager.removeDrink(id)
+            res.status(200).json({ id, message: "Drink removed successfully!" });
+
+
+        } catch (error) {
+            console.error("Error adding drink:", error);
+            res.status(500).json({ message: "Error removing drink", error: error.message });
+
         }
-
-        writeJSONFile(filePath, { drinks: updatedDrinks });
-        res.status(200).json({ message: 'Drink deleted successfully', drinks: filteredDrinks });
-    } catch (error) {
-        res.status(500).json({ message: ' Server error', error: error.message });
     }
-})
 
-/* PUT/ api / drinks
 
-- Should be able to edit drinks in a file
-- Maybe should include an api bulk edits based on id & category selection, if one is invalid change all except the one
+)
 
-- Make sure that the ID exists or isn't missing
-- What happens when there is an empty request body ?
-- Invalid or missing fields
-- Ingredients has to be an array of strings , so there needs to be a check for this
-- Alcohol content can't exceed 100
-- Inputs for the other fields must be valid in terms of value type
-- Must not allow duplicate ingredients
-- Converts all string input into lowercase
-- All Cocktails should have more than 1 percent alcohol
-- All Mocktails should have 0 as alcohol content
-- Request body is too large
-- Permission check ?
-- Allergen safety warning ?
-
- */
 
 app.put('/api/drinks/:id', (req , res) => {
+    const { name, category, ingredients, glass, alcoholContent, allergens } = req.body;
     const filePath = path.join(__dirname, 'drinks.json');
     const id = req.params.id;
 
@@ -190,11 +206,17 @@ app.put('/api/drinks/:id', (req , res) => {
         return res.status(404).json({message: 'Drink not found'});
     }
 
-    if (!name || !category || !ingredients || !glass || !alcoholContent) {
+    if (!name || !category || !ingredients || !glass || !alcoholContent || !allergens) {
             return res.status(400).json({message: 'Missing required fields'});
     }
+
+    if (!Array.isArray(ingredients) || ingredients.some(i => typeof i !== 'string')) {
+            return res.status(400).json({ message: 'Ingredients must be an array of strings' });
+        }
+
         fileData.drinks[drinkIndex] = { id, name, category, ingredients, glass, alcoholContent };
         writeFileSync(filePath, JSON.stringify(fileData), 'utf8');
+
         res.status(200).json({ message: 'Drink updated successfully', drinks: fileData.drinks });
     } catch(error){
             res.status(500).json({ message: 'Internal server error', error: error.message });
