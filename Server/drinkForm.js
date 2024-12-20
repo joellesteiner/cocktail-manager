@@ -45,17 +45,30 @@ export class Drink {
 
 }
 
-export class CategoryManager{
-    constructor() {
+export class CategoryManager {
+    constructor(filePath) {
+        this.filePath = filePath;
         this.categories = {
-
             mocktail: [],
             cocktail: [],
-            other: []
-
-        }
+            other: [],
+        };
+        this.loadDrinksFromFile();
     }
 
+    loadDrinksFromFile() {
+        try {
+            const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'));
+            fileData.drinks.forEach(drink => {
+                const category = drink.category?.trim().toLowerCase();
+                if (this.categories[category]) {
+                    this.categories[category].push(drink); // Assign to the appropriate category.
+                }
+            });
+        } catch (error) {
+            throw new Error("Error loading drinks into categories: " + error.message);
+        }
+    }
     assignDrinkToCategory(drink,category){
         const normalCategory = category.trim().toLowerCase()
 
@@ -93,16 +106,13 @@ export class CategoryManager{
 
     }
 
-
 }
 
 export class DrinksManager{
     constructor() {
 
     this.filePath = path.join(__dirname, "drinks.json");
-    this.CategoryManager = new CategoryManager();
-
-
+    this.CategoryManager = new CategoryManager(this.filePath);
 
     }
 
@@ -163,8 +173,8 @@ export class DrinksManager{
 
     findDuplicate(drink) {
         return this.getAllDrinks().some(existingDrink =>
-            existingDrink.name.toLowerCase().trim() === drink.name.toLowerCase().trim() &&
-            existingDrink.category.toLowerCase().trim() === drink.category.toLowerCase().trim()
+            existingDrink.name === drink.name &&
+            existingDrink.category === drink.category
         );
     }
 

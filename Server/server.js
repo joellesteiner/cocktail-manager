@@ -3,7 +3,7 @@ import path from 'path';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Drink, DrinksManager, CategoryManager } from './drinkForm.js';
+import { Drink, CategoryManager, DrinksManager } from './drinkForm.js';
 import { v4 as uuidv4 } from 'uuid';
 
 const app = express();
@@ -42,32 +42,34 @@ app.get('/api/drinks', (req, res) => {
         res.status(500).json({
             message: 'Error fetching drinks',
             error: error.message
+
         });
+    }
+});
 
 
-        app.get('api/drinks/:category', (req, res) => {
-            const category = req.params.category.trim().toLowerCase();
-            const validCategories = ["cocktail", "mocktail", "other"];
 
-            if (!validCategories.includes(category)) {
-                return res.status(400).json({ message: 'Invalid category. Please choose from cocktail, mocktail, or other.' });
-            }
-            try{
-                const drinksManager = new DrinksManager();
-                const drinksInCategory = drinksManager.CategoryManager.getDrinksByCategory(category);
-                if (drinksInCategory.length === 0) {
-                    return res.status(404).json({ message: `No drinks found in the '${category}' category` });
-                }
-                res.status(200).json(drinksInCategory);
-            } catch (error) {
-                console.error("Error retrieving drinks by category:", error);
-                res.status(500).json({ message: "Error retrieving drinks by category", error: error.message });
-            }
-        });
 
+app.get('/api/drinks/category/:category', (req, res) => {
+
+    try {
+        const category = req.params.category.trim().toLowerCase();
+
+        const categoryManager = new CategoryManager(path.join(__dirname, 'drinks.json'));
+        const drinksInCategory = categoryManager.getDrinksByCategory(category);
+
+        if (drinksInCategory.length === 0) {
+            return res.status(404).json({message: `No drinks found in the '${category}' category`});
+        }
+        res.status(200).json(drinksInCategory);
+    } catch (error) {
+        console.error("Error retrieving drinks by category:", error);
+        res.status(500).json({message: "Error retrieving drinks by category", error: error.message});
+    }
+});
         app.get('/api/drinks/:id', (req, res) => {
-            const filePath = path.join(__dirname, 'drinks.json');
             const id = req.params.id;
+            const filePath = path.join(__dirname, 'drinks.json');
 
             try {
                 const myData = readJSONFile(filePath);
@@ -76,12 +78,8 @@ app.get('/api/drinks', (req, res) => {
                 if (!drink) {
                     return res.status(404).json({message: 'Drink not found'});
                 }
+                res.status(200).json({ message: 'Drink found', drink: drink });
 
-                if (drink.allergens.length > 0) {
-                    return res.status(200).json({allergens: drink.allergens});
-                } else {
-                    return res.status(200).json({message: 'No allergens listed for this drink.'});
-                }
 
             } catch (error) {
                 console.error("Error retrieving drink by ID:", error)
@@ -177,12 +175,7 @@ app.get('/api/drinks', (req, res) => {
             }
 
         });
-        app.listen(port, () => {
-            console.log(`Server running at http://localhost:${port}`);
-        });
 
-    }
-});
 
 
 

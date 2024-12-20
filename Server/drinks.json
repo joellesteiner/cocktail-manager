@@ -1,1 +1,75 @@
-{"drinks":[{},{"id":"1733763817511","name":" Espresso Martini ","category":"Cocktail","ingredients":["Ingredient 1","Ingredient 2"],"glass":"Cocktail glass","alcoholContent":14},{"id":"1733839734196","name":" Shirley Temple ","category":"Mocktail","ingredients":["Ingredient 1","Ingredient 2"],"glass":"Cocktail glass","alcoholContent":0},{"name":"martini","category":"cocktail","ingredients":["Ingredient 1","Ingredient 2"],"glass":"Cocktail glass","alcoholContent":14},{"name":"66687","category":"cocktail","ingredients":["Ingredient 1","Ingredient 2"],"glass":"Cocktail glass","alcoholContent":14},{"name":"amaretto sour","category":"cocktail","ingredients":["Ingredient 1","Ingredient 2"],"glass":"Cocktail glass","alcoholContent":14,"id":"ec052de1-297e-4b6a-817b-874b49a92bff"}]}
+{
+  "drinks": [
+    {},
+    {
+      "id": "1733839734196",
+      "name": " Shirley Temple ",
+      "category": "Mocktail",
+      "ingredients": [
+        "Ingredient 1",
+        "Ingredient 2"
+      ],
+      "glass": "Cocktail glass",
+      "alcoholContent": 0
+    },
+    {
+      "name": "martini",
+      "category": "cocktail",
+      "ingredients": [
+        "Ingredient 1",
+        "Ingredient 2"
+      ],
+      "glass": "Cocktail glass",
+      "alcoholContent": 14
+    },
+    {
+      "name": "66687",
+      "category": "cocktail",
+      "ingredients": [
+        "Ingredient 1",
+        "Ingredient 2"
+      ],
+      "glass": "Cocktail glass",
+      "alcoholContent": 14
+    },
+    {
+      "name": "amaretto sour",
+      "category": "cocktail",
+      "ingredients": [
+        "Ingredient 1",
+        "Ingredient 2"
+      ],
+      "glass": "Cocktail glass",
+      "alcoholContent": 14,
+      "id": "ec052de1-297e-4b6a-817b-874b49a92bff"
+    },
+    {
+      "name": "green juice",
+      "category": "other",
+      "ingredients": [
+        "celery",
+        "apples"
+      ],
+      "glass": "Tall glass",
+      "alcoholContent": 0,
+      "allergens": [
+        "pineapple"
+      ],
+      "id": "22a656c9-407d-4dbd-9c7d-f472d5e8ff37"
+    },
+    {
+      "name": "passionfruit martini",
+      "category": "cocktail",
+      "ingredients": [
+        "Ingredient 1",
+        "Ingredient 2"
+      ],
+      "glass": "Cocktail glass",
+      "alcoholContent": 23,
+      "allergens": [
+        "none"
+      ],
+      "id": "1f3b3be0-c4f9-4030-b121-b7c253d92da4"
+    }
+  ]
+}
