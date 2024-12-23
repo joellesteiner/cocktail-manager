@@ -2,6 +2,8 @@ import path from "path";
 import {readFileSync, writeFileSync} from "node:fs";
 import {fileURLToPath} from "node:url";
 import { dirname } from 'path';
+import React, { useState, useEffect } from 'react';
+
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -21,8 +23,6 @@ export class Drink {
         if(!Array.isArray(allergens)) {
             throw new Error("Invalid allergens.");
         }
-
-
 
         const validCategories = ["cocktail", "mocktail", "other"];
         if (!validCategories.includes(category)) {
@@ -85,7 +85,6 @@ export class CategoryManager {
             throw new Error("Drink already exists in this category.");
         }
          this.categories[normalCategory].push(drink);
-
     }
 
     getDrinksByCategory( category){
@@ -119,14 +118,11 @@ export class DrinksManager{
     getAllDrinks() {
         try{
             const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'));
-            return fileData.drinks;
-
+            return fileData.drinks || [];
         }
         catch (error) {
             throw new Error('Error retrieving the drinks list: ' + error.message);
         }
-
-
     }
 
     removeDrink(id){
@@ -159,15 +155,11 @@ export class DrinksManager{
     }
     addDrink(newDrink) {
         const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'));
-
         if (this.findDuplicate(newDrink)) {
             throw new Error('Drink already exists in this category.');
         }
-
         fileData.drinks.push(newDrink);
-
         writeFileSync(this.filePath, JSON.stringify(fileData, null, 2), 'utf8');
-
         this.CategoryManager.assignDrinkToCategory(newDrink, newDrink.category);
     }
 
@@ -178,7 +170,82 @@ export class DrinksManager{
         );
     }
 
-
-
 }
+// Express App Setup
 
+const DrinkForm = ({ onSave, editDrink }) => {
+    const [formData, setFormData] = useState({
+        name: '',
+        category: '',
+        ingredients: '',
+        glass: '',
+        alcoholContent: '',
+        allergens: '',
+    });
+
+    useEffect(() => {
+        if (editDrink) {
+            setFormData(editDrink);
+        }
+    }, [editDrink]);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const drinkData = {
+            ...formData,
+            ingredients: formData.ingredients.split(',').map((i) => i.trim()),
+            allergens: formData.allergens.split(',').map((a) => a.trim()),
+        };
+        onSave(drinkData);
+        setFormData({ name: '', category: '', ingredients: '', glass: '', alcoholContent: '', allergens: '' });
+    };
+
+    return (
+        < form onSubmit={handleSubmit}>
+            <input
+                type="text"
+                placeholder="Name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+            />
+            <input
+                type="text"
+                placeholder="Category (cocktail/mocktail/other)"
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                required
+            />
+            <input
+                type="text"
+                placeholder="Ingredients (comma-separated)"
+                value={formData.ingredients}
+                onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
+                required
+            />
+            <input
+                type="text"
+                placeholder="Glass"
+                value={formData.glass}
+                onChange={(e) => setFormData({ ...formData, glass: e.target.value })}
+                required
+            />
+            <input
+                type="number"
+                placeholder="Alcohol Content (%)"
+                value={formData.alcoholContent}
+                onChange={(e) => setFormData({ ...formData, alcoholContent: e.target.value })}
+            />
+            <input
+                type="text"
+                placeholder="Allergens (comma-separated)"
+                value={formData.allergens}
+                onChange={(e) => setFormData({ ...formData, allergens: e.target.value })}
+            />
+            <button type="submit">{editDrink ? 'Update Drink' : 'Add Drink'}</button>
+        </form>
+
+    );
+
+};
+export default DrinkForm;

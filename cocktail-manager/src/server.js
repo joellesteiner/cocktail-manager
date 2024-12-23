@@ -3,14 +3,17 @@ import path from 'path';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Drink, CategoryManager, DrinksManager } from './drinkForm.js';
+import { Drink, CategoryManager, DrinksManager } from '../../frontend/src/drinkForm.js';
 import { v4 as uuidv4 } from 'uuid';
 
 const app = express();
-const port = 3000;
+const cors = require('cors');
+const port = 3001;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 app.use(express.json());
+app.use(cors());
+
 
 app.use((req, res, next) => {
     console.log(`[${req.method}] ${req.path} Received request`);
@@ -39,23 +42,15 @@ app.get('/api/drinks', (req, res) => {
         });
         } catch (error) {
         console.error("Error fetching drinks:", error);
-        res.status(500).json({
-            message: 'Error fetching drinks',
-            error: error.message
-
-        });
     }
 });
-
-
-
 
 app.get('/api/drinks/category/:category', (req, res) => {
 
     try {
         const category = req.params.category.trim().toLowerCase();
 
-        const categoryManager = new CategoryManager(path.join(__dirname, 'drinks.json'));
+        const categoryManager = new CategoryManager();
         const drinksInCategory = categoryManager.getDrinksByCategory(category);
 
         if (drinksInCategory.length === 0) {
@@ -63,8 +58,7 @@ app.get('/api/drinks/category/:category', (req, res) => {
         }
         res.status(200).json(drinksInCategory);
     } catch (error) {
-        console.error("Error retrieving drinks by category:", error);
-        res.status(500).json({message: "Error retrieving drinks by category", error: error.message});
+        return res.status(404).json({message: `No drinks found in the '${category}' category`});
     }
 });
         app.get('/api/drinks/:id', (req, res) => {
@@ -79,7 +73,6 @@ app.get('/api/drinks/category/:category', (req, res) => {
                     return res.status(404).json({message: 'Drink not found'});
                 }
                 res.status(200).json({ message: 'Drink found', drink: drink });
-
 
             } catch (error) {
                 console.error("Error retrieving drink by ID:", error)
@@ -115,7 +108,6 @@ app.get('/api/drinks/category/:category', (req, res) => {
                 }
 
                 drinksManager.addDrink(newDrink);
-
                 res.status(201).json({ id: newDrink.id, message: "Drink added successfully!" });
 
             } catch (error) {
@@ -124,26 +116,19 @@ app.get('/api/drinks/category/:category', (req, res) => {
             }
         });
 
-
-
         app.delete('/api/drinks/:id', (req, res) => {
-                const id = req.params.id;
-
                 try {
+                    const id = req.params.id;
                     const drinkManager = new DrinksManager()
-
-                    drinkManager.removeDrink(id)
-                    res.status(200).json({id, message: "Drink removed successfully!"});
-
-
+                    const removedDrink = drinkManager.removeDrink(id);
+                    if (!removedDrink) {
+                        return res.status(404).json({ message: "Drink not found" });
+                    }
+                    res.status(200).json({ id, message: "Drink removed successfully!" });
                 } catch (error) {
-                    console.error("Error adding drink:", error);
                     res.status(500).json({message: "Error removing drink", error: error.message});
-
                 }
-            }
-        )
-
+            });
 
         app.put('/api/drinks/:id', (req, res) => {
             const {name, category, ingredients, glass, alcoholContent, allergens} = req.body;
@@ -183,3 +168,4 @@ app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
 
+app.use(cors());
