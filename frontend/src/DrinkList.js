@@ -1,4 +1,3 @@
-// src/components/DrinkList.js
 import React from 'react';
 
 const DrinkList = ({ drinks, onDelete, onEdit }) => {
@@ -23,3 +22,4 @@ const DrinkList = ({ drinks, onDelete, onEdit }) => {
 };
 
 export default DrinkList;
+

@@ -3,13 +3,14 @@ import path from 'path';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Drink, CategoryManager, DrinksManager } from '../../frontend/src/drinkForm.js';
+import { Drink, CategoryManager, DrinksManager } from './frontend/src/drinkForm.js';
 import { v4 as uuidv4 } from 'uuid';
+import cors from 'cors'
 
 const app = express();
-const cors = require('cors');
 const port = 3001;
 const __dirname = dirname(fileURLToPath(import.meta.url));
+app.use(cors({ origin: "http://localhost:3001" }));
 
 app.use(express.json());
 app.use(cors());
