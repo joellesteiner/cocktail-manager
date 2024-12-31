@@ -1,13 +1,13 @@
 import path from "path";
 import {readFileSync, writeFileSync} from "node:fs";
 import {fileURLToPath} from "node:url";
-import { dirname } from 'path';
+import {dirname} from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export class Drink {
 
-    constructor(name, category, ingredients, glass, alcoholContent = null, allergens= []) {
+    constructor(name, category, ingredients, glass, alcoholContent = null, allergens = []) {
         this.name = name.trim().toLowerCase();
         if (typeof category !== 'string') {
             throw new Error("Category must be a string");
@@ -18,7 +18,7 @@ export class Drink {
         this.alcoholContent = alcoholContent;
         this.allergens = allergens;
 
-        if(!Array.isArray(allergens)) {
+        if (!Array.isArray(allergens)) {
             throw new Error("Invalid allergens.");
         }
 
@@ -27,15 +27,15 @@ export class Drink {
             throw new Error("Invalid category.Please choose from cocktail, mocktail or other.")
         }
 
-        if(typeof this.name !== "string") {
+        if (typeof this.name !== "string") {
             throw new Error("Invalid name.")
         }
 
-        if(!Array.isArray(ingredients) || this.ingredients.length === 0) {
+        if (!Array.isArray(ingredients) || this.ingredients.length === 0) {
             throw new Error("Invalid ingredients.");
         }
 
-        if (typeof this.alcoholContent !== "number" || this.alcoholContent < 0 || this.alcoholContent > 100){
+        if (typeof this.alcoholContent !== "number" || this.alcoholContent < 0 || this.alcoholContent > 100) {
             throw new Error("Invalid, Alcohol content must be a number between 0 - 100");
         }
 
@@ -67,7 +67,8 @@ export class CategoryManager {
             throw new Error("Error loading drinks into categories: " + error.message);
         }
     }
-    assignDrinkToCategory(drink,category){
+
+    assignDrinkToCategory(drink, category) {
         const normalCategory = category.trim().toLowerCase()
 
         const validCategories = ["cocktail", "mocktail", "other"];
@@ -82,18 +83,18 @@ export class CategoryManager {
         if (duplicateDrink) {
             throw new Error("Drink already exists in this category.");
         }
-         this.categories[normalCategory].push(drink);
+        this.categories[normalCategory].push(drink);
     }
 
-    getDrinksByCategory( category){
+    getDrinksByCategory(category) {
         const normalCategory = category.trim().toLowerCase()
-        if (!this.categories.hasOwnProperty(normalCategory) ) {
+        if (!this.categories.hasOwnProperty(normalCategory)) {
             throw new Error("Invalid Category");
         }
         return this.categories[normalCategory]
     }
 
-    removeDrinkFromCategory(id, category){
+    removeDrinkFromCategory(id, category) {
         const normalCategory = category.trim().toLowerCase()
         const categoryDrinks = this.categories[normalCategory];
 
@@ -105,25 +106,24 @@ export class CategoryManager {
 
 }
 
-export class DrinksManager{
+export class DrinksManager {
     constructor() {
 
-    this.filePath = path.join(__dirname, "drinks.json");
-    this.CategoryManager = new CategoryManager(this.filePath);
+        this.filePath = path.join(__dirname, "drinks.json");
+        this.CategoryManager = new CategoryManager(this.filePath);
 
     }
 
     getAllDrinks() {
-        try{
+        try {
             const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'));
             return fileData.drinks || [];
-        }
-        catch (error) {
+        } catch (error) {
             throw new Error('Error retrieving the drinks list: ' + error.message);
         }
     }
 
-    removeDrink(id){
+    removeDrink(id) {
 
         const writeJSONFile = (filePath, data) => {
             try {
@@ -137,20 +137,20 @@ export class DrinksManager{
             const drinkIndex = fileData.drinks.findIndex(drink => drink.id === id);
 
             if (drinkIndex === -1) {
-                return null ;
+                return null;
             }
             const drinkCategory = fileData.drinks[drinkIndex].category;
             const removedDrink = fileData.drinks.splice(drinkIndex, 1)[0];
             this.CategoryManager.removeDrinkFromCategory(id, drinkCategory);
-            writeJSONFile(this.filePath, { drinks: fileData.drinks });
+            writeJSONFile(this.filePath, {drinks: fileData.drinks});
             return removedDrink;
-        }
-        catch(error){
+        } catch (error) {
             throw new Error('Error removing the drink: ' + error.message);
 
         }
 
     }
+
     addDrink(newDrink) {
         const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'));
         if (this.findDuplicate(newDrink)) {
@@ -165,7 +165,6 @@ export class DrinksManager{
         return this.getAllDrinks().some(existingDrink =>
             existingDrink.name === drink.name &&
             existingDrink.category === drink.category
-
         );
     };
 

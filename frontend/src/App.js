@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import DrinkList from 'frontend/src/DrinkList.js';
+import DrinkList from './DrinkList.js';
+import './App.css';
 
 const App = () => {
     const [drinks, setDrinks] = useState([]);
@@ -10,6 +11,10 @@ const App = () => {
     const [glass, setGlass] = useState('');
     const [alcoholContent, setAlcoholContent] = useState('');
     const [allergens, setAllergens] = useState('');
+    const [editMode, setEditMode] = useState(false);
+    const [currentDrink, setCurrentDrink] = useState(null);
+
+    const categories = ['cocktail', 'mocktail', 'other']; // Predefined categories for selection
 
     useEffect(() => {
         const loadDrinks = async () => {
@@ -22,36 +27,94 @@ const App = () => {
         };
 
         loadDrinks();
+
     }, []);
 
-    const fetchDrinks = async () => {
+    const fetchDrinks = async (category = '') => {
         try {
-            const response = await axios.get('http://localhost:3001/api/drinks');
-            setDrinks(response.data.drinks || []); // Update the drinks state
+            const url = category
+                ? `http://localhost:3001/api/drinks/category/${category}`
+                : 'http://localhost:3001/api/drinks';
+
+            console.log('Fetching drinks from URL:', url);  // Debug log
+            const response = await axios.get(url);
+            setDrinks(response.data.drinks || []);
         } catch (error) {
             console.error('Error fetching drinks:', error.message);
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleCategoryChange = (event) => {
+        const selectedCategory = event.target.value;
+        console.log('Category Selected:', selectedCategory);  // Add this line to debug
+        setCategory(selectedCategory);
+        fetchDrinks(selectedCategory);  // Fetch drinks based on the selected category
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
 
         const drinkData = {
-            name: drinkName,
-            category,
-            ingredients: ingredients.split(', '),
-            glass,
-            alcoholContent: parseFloat(alcoholContent),
-            allergens: allergens.split(', '),
+            name: drinkName.trim(),
+            category: category.trim(),
+            ingredients: ingredients.split(',').map((item) => item.trim()),
+            glass: glass.trim(),
+            alcoholContent: parseInt(alcoholContent) || 0,
+            allergens: allergens.split(',').map((item) => item.trim()),
         };
 
+        console.log('Data being sent to server:', drinkData);
+
         try {
-            await axios.post('http://localhost:3001/api/drinks', drinkData);
-            await fetchDrinks();
+            if (editMode && currentDrink) {
+                console.log('Sending PUT request...');
+                console.log('Current drink ID:', currentDrink.id);
+                const response = await axios.put(`http://localhost:3001/api/drinks/${currentDrink.id}`, drinkData, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                console.log('Drink updated:', response.data);
+            } else {
+                console.log('Sending POST request...');
+                const response = await axios.post('http://localhost:3001/api/drinks', drinkData, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                console.log('New drink added:', response.data);
+            }
+
+            await fetchDrinks();  // Refresh drinks after adding or updating
             clearForm();
         } catch (error) {
-            console.error('Error saving drink:', error);
+            console.error('Error saving drink:', error.response?.data || error.message);
         }
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            await axios.delete(`http://localhost:3001/api/drinks/${id}`);
+            setDrinks((prevDrinks) => prevDrinks.filter((drink) => drink.id !== id));
+            console.log('Drink deleted successfully');
+        } catch (error) {
+            console.error('Error deleting drink:', error.message);
+        }
+    };
+
+    const handleEdit = (drink) => {
+        const ingredientsArray = Array.isArray(drink.ingredients) ? drink.ingredients : [];
+        const allergensArray = Array.isArray(drink.allergens) ? drink.allergens : [];
+
+        setDrinkName(drink.name);
+        setCategory(drink.category);
+        setIngredients(ingredientsArray.join(', '));
+        setGlass(drink.glass);
+        setAlcoholContent(drink.alcoholContent.toString());
+        setAllergens(allergensArray.join(', '));
+
+        setEditMode(true);
+        setCurrentDrink(drink);
     };
 
     const clearForm = () => {
@@ -61,6 +124,8 @@ const App = () => {
         setGlass('');
         setAlcoholContent('');
         setAllergens('');
+        setEditMode(false);
+        setCurrentDrink(null);
     };
 
     return (
@@ -74,11 +139,18 @@ const App = () => {
                     onChange={(e) => setDrinkName(e.target.value)}
                 />
                 <label>Category:</label>
-                <input
-                    type="text"
+                <select
                     value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                />
+                    onChange={handleCategoryChange}
+                >
+                    <option value="">Select a category</option>
+                    {categories.map((cat) => (
+                        <option key={cat} value={cat}>
+                            {cat}
+                        </option>
+                    ))}
+                </select>
+
                 <label>Ingredients (comma separated):</label>
                 <input
                     type="text"
@@ -103,12 +175,13 @@ const App = () => {
                     value={allergens}
                     onChange={(e) => setAllergens(e.target.value)}
                 />
-                <button type="submit">Add Drink</button>
+                <button type="submit">{editMode ? 'Update Drink' : 'Add Drink'}</button>
             </form>
 
-            <DrinkList drinks={drinks} />
+            <DrinkList drinks={drinks} onDelete={handleDelete} onEdit={handleEdit} />
         </div>
     );
 };
 
 export default App;
+

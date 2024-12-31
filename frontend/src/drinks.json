@@ -1,17 +1,5 @@
 {
   "drinks": [
-    {},
-    {
-      "id": "1733839734196",
-      "name": " Shirley Temple ",
-      "category": "Mocktail",
-      "ingredients": [
-        "Ingredient 1",
-        "Ingredient 2"
-      ],
-      "glass": "Cocktail glass",
-      "alcoholContent": 0
-    },
     {
       "name": "martini",
       "category": "cocktail",
@@ -20,17 +8,25 @@
         "Ingredient 2"
       ],
       "glass": "Cocktail glass",
-      "alcoholContent": 14
+      "alcoholContent": 14,
+      "allergens": [
+        "Olives"
+      ],
+      "id": "f7c44a1e-d2e5-4377-9b7c-88f97b1329c9"
     },
     {
-      "name": "66687",
+      "name": "Gin and Tonic ",
       "category": "cocktail",
       "ingredients": [
         "Ingredient 1",
         "Ingredient 2"
       ],
       "glass": "Cocktail glass",
-      "alcoholContent": 14
+      "alcoholContent": 14,
+      "allergens": [
+        "None"
+      ],
+      "id": "45e204f1-4374-4606-b698-8b1c9e5b5d78"
     },
     {
       "name": "amaretto sour",
@@ -41,21 +37,10 @@
       ],
       "glass": "Cocktail glass",
       "alcoholContent": 14,
-      "id": "ec052de1-297e-4b6a-817b-874b49a92bff"
-    },
-    {
-      "name": "green juice",
-      "category": "other",
-      "ingredients": [
-        "celery",
-        "apples"
-      ],
-      "glass": "Tall glass",
-      "alcoholContent": 0,
+      "id": "ec052de1-297e-4b6a-817b-874b49a92bff",
       "allergens": [
-        "pineapple"
-      ],
-      "id": "22a656c9-407d-4dbd-9c7d-f472d5e8ff37"
+        "Citrus"
+      ]
     },
     {
       "name": "passionfruit martini",
@@ -70,6 +55,20 @@
         "none"
       ],
       "id": "1f3b3be0-c4f9-4030-b121-b7c253d92da4"
+    },
+    {
+      "name": "gin and tonic",
+      "category": "cocktail",
+      "ingredients": [
+        "Ingredient 1",
+        "Ingredient 2"
+      ],
+      "glass": "Cocktail glass",
+      "alcoholContent": 14,
+      "allergens": [
+        "None"
+      ],
+      "id": "b0de6f0a-cdf5-4ffd-a334-b084f5e5f7b7"
     }
   ]
 }
