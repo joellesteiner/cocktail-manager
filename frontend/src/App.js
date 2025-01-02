@@ -14,7 +14,7 @@ const App = () => {
     const [editMode, setEditMode] = useState(false);
     const [currentDrink, setCurrentDrink] = useState(null);
 
-    const categories = ['cocktail', 'mocktail', 'other']; // Predefined categories for selection
+    const categories = ['cocktail', 'mocktail', 'other'];
 
     useEffect(() => {
         const loadDrinks = async () => {
@@ -46,13 +46,18 @@ const App = () => {
 
     const handleCategoryChange = (event) => {
         const selectedCategory = event.target.value;
-        console.log('Category Selected:', selectedCategory);  // Add this line to debug
+        console.log('Category Selected:', selectedCategory);
         setCategory(selectedCategory);
-        fetchDrinks(selectedCategory);  // Fetch drinks based on the selected category
+        fetchDrinks(selectedCategory);
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if (!drinkName.trim() || !category.trim() || !ingredients.trim() || !glass.trim()) {
+            alert('All fields are required.');
+            return;
+        }
 
         const drinkData = {
             name: drinkName.trim(),
@@ -66,31 +71,23 @@ const App = () => {
         console.log('Data being sent to server:', drinkData);
 
         try {
-            if (editMode && currentDrink) {
-                console.log('Sending PUT request...');
-                console.log('Current drink ID:', currentDrink.id);
-                const response = await axios.put(`http://localhost:3001/api/drinks/${currentDrink.id}`, drinkData, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                console.log('Drink updated:', response.data);
-            } else {
-                console.log('Sending POST request...');
-                const response = await axios.post('http://localhost:3001/api/drinks', drinkData, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                console.log('New drink added:', response.data);
-            }
+            // if (editMode && currentDrink) {
+            //     console.log('Sending PUT request for ID:', currentDrink.id);
+            //     await axios.put(`http://localhost:3001/api/drinks/${currentDrink.id}`, drinkData);
+            // } else {
+            //     console.log('Sending POST request...');
+            //     await axios.post('http://localhost:3001/api/drinks', drinkData);
+            // }
 
-            await fetchDrinks();  // Refresh drinks after adding or updating
+            console.log(currentDrink.id, drinkData)
+
+            await fetchDrinks();
             clearForm();
         } catch (error) {
             console.error('Error saving drink:', error.response?.data || error.message);
         }
     };
+
 
     const handleDelete = async (id) => {
         try {
@@ -178,7 +175,7 @@ const App = () => {
                 <button type="submit">{editMode ? 'Update Drink' : 'Add Drink'}</button>
             </form>
 
-            <DrinkList drinks={drinks} onDelete={handleDelete} onEdit={handleEdit} />
+            <DrinkList drinks={drinks} onDelete={handleDelete} onEdit={handleEdit} currentCategory={category} />
         </div>
     );
 };

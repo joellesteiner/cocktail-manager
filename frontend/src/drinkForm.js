@@ -114,6 +114,10 @@ export class DrinksManager {
 
     }
 
+    getFilePath() {
+        return this.filePath
+    }
+
     getAllDrinks() {
         try {
             const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'));

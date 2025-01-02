@@ -11,7 +11,6 @@ const app = express();
 const port = 3001;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Middleware
 app.use(cors({
     origin: ['http://localhost:3000', 'http://localhost:3006' ],
     methods: ['GET', 'POST', 'DELETE', 'PUT'],
@@ -24,13 +23,19 @@ app.use((req, res, next) => {
     next();
 });
 
-// Utility functions
 const readJSONFile = (filePath) => {
     try {
         const data = readFileSync(filePath, 'utf8');
+        if (!data) {
+            console.warn('File is empty, initialising w/ default structure.');
+            return { drinks: [] };
+        }
+        console.log(data)
         return JSON.parse(data);
     } catch (error) {
-        throw new Error("Error reading or parsing JSON data");
+        console.error('Error reading or parsing JSON file:', error.message);
+        console.warn('Reinitializing file with default structure.');
+        return { drinks: [] };
     }
 };
 
@@ -57,7 +62,6 @@ const validateDrinkFields = (fields) => {
     return null;
 };
 
-// API Routes
 app.get('/api/drinks', (req, res) => {
     try {
         const drinksManager = new DrinksManager();
@@ -155,11 +159,25 @@ app.delete('/api/drinks/:id', (req, res) => {
 app.put('/api/drinks/:id', (req, res) => {
     const id = req.params.id;
     console.log('Updating drink with ID:', id);
-
-    const filePath = path.join(__dirname, 'drinks.json');
+    const drinksManager = new DrinksManager();
+    const fileData = drinksManager.getAllDrinks();
+    console.log(fileData)
     try {
-        const fileData = readJSONFile(filePath);
-        const drinkIndex = fileData.drinks.findIndex(drink => drink.id === id);
+        const drinkIndex = fileData.findIndex(drink => drink.id === id);
+
+        console.log('File data:', fileData);
+        console.log('Drink index:', drinkIndex);
+
+        const { name, category, ingredients, glass, alcoholContent, allergens } = req.body;
+        fileData[drinkIndex] = {
+            ...fileData[drinkIndex],
+            name,
+            category,
+            ingredients,
+            glass,
+            alcoholContent,
+            allergens
+        };
 
         if (drinkIndex === -1) {
             return res.status(404).json({ message: 'Drink not found' });
@@ -169,18 +187,8 @@ app.put('/api/drinks/:id', (req, res) => {
             return res.status(400).json({ message: validationError });
         }
 
-        const { name, category, ingredients, glass, alcoholContent, allergens } = req.body;
-        fileData.drinks[drinkIndex] = {
-            ...fileData.drinks[drinkIndex],
-            name,
-            category,
-            ingredients,
-            glass,
-            alcoholContent,
-            allergens
-        };
 
-        writeJSONFile(filePath, fileData);
+        writeJSONFile(drinksManager.getFilePath(), fileData);
         res.status(200).json({ message: 'Drink updated successfully', drink: fileData.drinks[drinkIndex] });
 
     } catch (error) {

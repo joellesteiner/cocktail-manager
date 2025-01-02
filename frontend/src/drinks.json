@@ -1,74 +1,73 @@
-{
-  "drinks": [
-    {
-      "name": "martini",
-      "category": "cocktail",
-      "ingredients": [
-        "Ingredient 1",
-        "Ingredient 2"
-      ],
-      "glass": "Cocktail glass",
-      "alcoholContent": 14,
-      "allergens": [
-        "Olives"
-      ],
-      "id": "f7c44a1e-d2e5-4377-9b7c-88f97b1329c9"
-    },
-    {
-      "name": "Gin and Tonic ",
-      "category": "cocktail",
-      "ingredients": [
-        "Ingredient 1",
-        "Ingredient 2"
-      ],
-      "glass": "Cocktail glass",
-      "alcoholContent": 14,
-      "allergens": [
-        "None"
-      ],
-      "id": "45e204f1-4374-4606-b698-8b1c9e5b5d78"
-    },
-    {
-      "name": "amaretto sour",
-      "category": "cocktail",
-      "ingredients": [
-        "Ingredient 1",
-        "Ingredient 2"
-      ],
-      "glass": "Cocktail glass",
-      "alcoholContent": 14,
-      "id": "ec052de1-297e-4b6a-817b-874b49a92bff",
-      "allergens": [
-        "Citrus"
-      ]
-    },
-    {
-      "name": "passionfruit martini",
-      "category": "cocktail",
-      "ingredients": [
-        "Ingredient 1",
-        "Ingredient 2"
-      ],
-      "glass": "Cocktail glass",
-      "alcoholContent": 23,
-      "allergens": [
-        "none"
-      ],
-      "id": "1f3b3be0-c4f9-4030-b121-b7c253d92da4"
-    },
-    {
-      "name": "gin and tonic",
-      "category": "cocktail",
-      "ingredients": [
-        "Ingredient 1",
-        "Ingredient 2"
-      ],
-      "glass": "Cocktail glass",
-      "alcoholContent": 14,
-      "allergens": [
-        "None"
-      ],
-      "id": "b0de6f0a-cdf5-4ffd-a334-b084f5e5f7b7"
-    }
-  ]
-}
+[
+  {
+    "name": "G & T ",
+    "category": "cocktail",
+    "ingredients": [
+      "Ingredient 1",
+      "Ingredient 2"
+    ],
+    "glass": "Cocktail glass",
+    "alcoholContent": 14,
+    "allergens": [
+      "None"
+    ],
+    "id": "45e204f1-4374-4606-b698-8b1c9e5b5d78"
+  },
+  {
+    "name": "amaretto sour",
+    "category": "cocktail",
+    "ingredients": [
+      "Ingredient 1",
+      "Ingredient 2"
+    ],
+    "glass": "Cocktail glass",
+    "alcoholContent": 14,
+    "id": "ec052de1-297e-4b6a-817b-874b49a92bff",
+    "allergens": [
+      "Citrus"
+    ]
+  },
+  {
+    "name": "passionfruit martini",
+    "category": "cocktail",
+    "ingredients": [
+      "Ingredient 1",
+      "Ingredient 2"
+    ],
+    "glass": "Cocktail glass",
+    "alcoholContent": 23,
+    "allergens": [
+      "none"
+    ],
+    "id": "1f3b3be0-c4f9-4030-b121-b7c253d92da4"
+  },
+  {
+    "name": "gin and tonic",
+    "category": "cocktail",
+    "ingredients": [
+      "Ingredient 1",
+      "Ingredient 2"
+    ],
+    "glass": "Cocktail glass",
+    "alcoholContent": 14,
+    "allergens": [
+      "None"
+    ],
+    "id": "b0de6f0a-cdf5-4ffd-a334-b084f5e5f7b7"
+  },
+  {
+    "name": "jamba juice",
+    "category": "other",
+    "ingredients": [
+      "pineapple",
+      "apple",
+      "strawberry"
+    ],
+    "glass": "tall",
+    "alcoholContent": 0,
+    "allergens": [
+      "pineapple"
+    ],
+    "id": "1cf49075-fe9e-436a-bc6d-a67eaf8eb2f1"
+  }
+]
