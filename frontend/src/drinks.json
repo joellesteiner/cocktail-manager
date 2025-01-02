@@ -1,73 +1,80 @@
-[
-  {
-    "name": "G & T ",
-    "category": "cocktail",
-    "ingredients": [
-      "Ingredient 1",
-      "Ingredient 2"
-    ],
-    "glass": "Cocktail glass",
-    "alcoholContent": 14,
-    "allergens": [
-      "None"
-    ],
-    "id": "45e204f1-4374-4606-b698-8b1c9e5b5d78"
-  },
-  {
-    "name": "amaretto sour",
-    "category": "cocktail",
-    "ingredients": [
-      "Ingredient 1",
-      "Ingredient 2"
-    ],
-    "glass": "Cocktail glass",
-    "alcoholContent": 14,
-    "id": "ec052de1-297e-4b6a-817b-874b49a92bff",
-    "allergens": [
-      "Citrus"
-    ]
-  },
-  {
-    "name": "passionfruit martini",
-    "category": "cocktail",
-    "ingredients": [
-      "Ingredient 1",
-      "Ingredient 2"
-    ],
-    "glass": "Cocktail glass",
-    "alcoholContent": 23,
-    "allergens": [
-      "none"
-    ],
-    "id": "1f3b3be0-c4f9-4030-b121-b7c253d92da4"
-  },
-  {
-    "name": "gin and tonic",
-    "category": "cocktail",
-    "ingredients": [
-      "Ingredient 1",
-      "Ingredient 2"
-    ],
-    "glass": "Cocktail glass",
-    "alcoholContent": 14,
-    "allergens": [
-      "None"
-    ],
-    "id": "b0de6f0a-cdf5-4ffd-a334-b084f5e5f7b7"
-  },
-  {
-    "name": "jamba juice",
-    "category": "other",
-    "ingredients": [
-      "pineapple",
-      "apple",
-      "strawberry"
-    ],
-    "glass": "tall",
-    "alcoholContent": 0,
-    "allergens": [
-      "pineapple"
-    ],
-    "id": "1cf49075-fe9e-436a-bc6d-a67eaf8eb2f1"
-  }
-]
+{
+  "drinks": [
+    {
+      "name": "amaretto sour",
+      "category": "cocktail",
+      "ingredients": [
+        "Ingredient 1",
+        "Ingredient 2"
+      ],
+      "glass": "Cocktail glass",
+      "alcoholContent": 10,
+      "id": "ec052de1-297e-4b6a-817b-874b49a92bff",
+      "allergens": [
+        "egg"
+      ]
+    },
+    {
+      "name": "passionfruit martini",
+      "category": "cocktail",
+      "ingredients": [
+        "Ingredient 1",
+        "Ingredient 2"
+      ],
+      "glass": "Cocktail glass",
+      "alcoholContent": 23,
+      "allergens": [
+        "none"
+      ],
+      "id": "1f3b3be0-c4f9-4030-b121-b7c253d92da4"
+    },
+    {
+      "name": "pineapple",
+      "category": "other",
+      "ingredients": [
+        "Pineapple",
+        "Water",
+        "Sugar",
+        "Banana"
+      ],
+      "glass": "Smoothie glass",
+      "alcoholContent": 0,
+      "allergens": [
+        "None"
+      ],
+      "id": "b047cfa0-a618-412a-a661-9d3b32fc7d89"
+    },
+    {
+      "name": "pina colada",
+      "category": "cocktail",
+      "ingredients": [
+        "coconut cream",
+        "rum",
+        "pineapple juice"
+      ],
+      "glass": "Poco Grande glass",
+      "alcoholContent": 13,
+      "allergens": [
+        "none"
+      ],
+      "id": "8dde7c00-83d1-4392-82d0-8bdf22b7f22b"
+    },
+    {
+      "name": "espresso martini",
+      "category": "cocktail",
+      "ingredients": [
+        "espresso",
+        "Vodka",
+        "Coffee liqueur",
+        "Simple syrup",
+        "Ice"
+      ],
+      "glass": "Cocktail glass",
+      "alcoholContent": 0,
+      "allergens": [
+        ""
+      ],
+      "id": "b3a13828-3d20-41ba-a00f-0cac5d85d458"
+    }
+  ]
+}

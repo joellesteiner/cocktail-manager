@@ -108,14 +108,12 @@ export class CategoryManager {
 
 export class DrinksManager {
     constructor() {
-
         this.filePath = path.join(__dirname, "drinks.json");
         this.CategoryManager = new CategoryManager(this.filePath);
-
     }
 
     getFilePath() {
-        return this.filePath
+        return this.filePath;
     }
 
     getAllDrinks() {
@@ -128,7 +126,6 @@ export class DrinksManager {
     }
 
     removeDrink(id) {
-
         const writeJSONFile = (filePath, data) => {
             try {
                 writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
@@ -136,23 +133,25 @@ export class DrinksManager {
                 throw new Error("Error writing data to JSON file: " + error.message);
             }
         }
+
         try {
-            const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'))
+            const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'));
             const drinkIndex = fileData.drinks.findIndex(drink => drink.id === id);
 
             if (drinkIndex === -1) {
                 return null;
             }
+
             const drinkCategory = fileData.drinks[drinkIndex].category;
             const removedDrink = fileData.drinks.splice(drinkIndex, 1)[0];
+
             this.CategoryManager.removeDrinkFromCategory(id, drinkCategory);
+
             writeJSONFile(this.filePath, {drinks: fileData.drinks});
             return removedDrink;
         } catch (error) {
             throw new Error('Error removing the drink: ' + error.message);
-
         }
-
     }
 
     addDrink(newDrink) {
@@ -165,12 +164,66 @@ export class DrinksManager {
         this.CategoryManager.assignDrinkToCategory(newDrink, newDrink.category);
     }
 
+    updateDrink(id, updatedDrinkDetails) {
+        try {
+            const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'));
+
+            const drinkIndex = fileData.drinks.findIndex(drink => drink.id === id);
+            if (drinkIndex === -1) {
+                throw new Error("Drink not found.");
+            }
+
+            const existingDrink = fileData.drinks[drinkIndex];
+
+            const updatedDrink = {
+                ...existingDrink,
+                ...updatedDrinkDetails,
+            };
+
+            this.validateDrinkFields(updatedDrink);
+
+            if (existingDrink.category !== updatedDrink.category) {
+                this.CategoryManager.removeDrinkFromCategory(id, existingDrink.category);
+                this.CategoryManager.assignDrinkToCategory(updatedDrink, updatedDrink.category);
+            }
+
+            fileData.drinks[drinkIndex] = updatedDrink;
+
+            writeFileSync(this.filePath, JSON.stringify(fileData, null, 2), 'utf8');
+
+            return updatedDrink;
+        } catch (error) {
+            throw new Error("Error updating the drink: " + error.message);
+        }
+    }
+
+    validateDrinkFields(drink) {
+        const { name, category, ingredients, alcoholContent } = drink;
+
+        if (!name || typeof name !== 'string') {
+            throw new Error('Invalid name: Name must be a non-empty string.');
+        }
+
+        const validCategories = ["cocktail", "mocktail", "other"];
+        if (!validCategories.includes(category.toLowerCase())) {
+            throw new Error('Invalid category: Please choose from "cocktail", "mocktail", or "other".');
+        }
+
+        if (!Array.isArray(ingredients) || ingredients.length === 0 || ingredients.some(i => typeof i !== 'string')) {
+            throw new Error('Invalid ingredients: Ingredients must be a non-empty array of strings.');
+        }
+
+        if (typeof alcoholContent !== 'number' || alcoholContent < 0 || alcoholContent > 100) {
+            throw new Error('Invalid alcohol content: Must be a number between 0 and 100.');
+        }
+    }
+
     findDuplicate(drink) {
         return this.getAllDrinks().some(existingDrink =>
             existingDrink.name === drink.name &&
             existingDrink.category === drink.category
         );
-    };
-
+    }
 }
+
 

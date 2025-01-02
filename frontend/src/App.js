@@ -71,13 +71,13 @@ const App = () => {
         console.log('Data being sent to server:', drinkData);
 
         try {
-            // if (editMode && currentDrink) {
-            //     console.log('Sending PUT request for ID:', currentDrink.id);
-            //     await axios.put(`http://localhost:3001/api/drinks/${currentDrink.id}`, drinkData);
-            // } else {
-            //     console.log('Sending POST request...');
-            //     await axios.post('http://localhost:3001/api/drinks', drinkData);
-            // }
+             if (editMode && currentDrink) {
+                console.log('Sending PUT request for ID:', currentDrink.id);
+                await axios.put(`http://localhost:3001/api/drinks/${currentDrink.id}`, drinkData);
+            } else {
+                console.log('Sending POST request...');
+                await axios.post('http://localhost:3001/api/drinks', drinkData);
+             }
 
             console.log(currentDrink.id, drinkData)
 

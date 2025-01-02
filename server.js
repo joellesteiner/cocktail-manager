@@ -1,6 +1,6 @@
 import express from 'express';
 import path from 'path';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Drink, CategoryManager, DrinksManager } from './frontend/src/drinkForm.js';
@@ -12,7 +12,7 @@ const port = 3001;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3006' ],
+    origin: ['http://localhost:3000'],
     methods: ['GET', 'POST', 'DELETE', 'PUT'],
     credentials: true
 }));
@@ -39,13 +39,6 @@ const readJSONFile = (filePath) => {
     }
 };
 
-const writeJSONFile = (filePath, data) => {
-    try {
-        writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
-    } catch (error) {
-        throw new Error("Error writing to JSON file");
-    }
-};
 
 const validateDrinkFields = (fields) => {
     const { name, category, ingredients, glass, alcoholContent, allergens } = fields;
@@ -75,6 +68,7 @@ app.get('/api/drinks', (req, res) => {
         res.status(500).json({ message: 'Error fetching drinks', error: error.message });
     }
 });
+
 
 app.get('/api/drinks/category/:category', (req, res) => {
     try {
@@ -159,44 +153,35 @@ app.delete('/api/drinks/:id', (req, res) => {
 app.put('/api/drinks/:id', (req, res) => {
     const id = req.params.id;
     console.log('Updating drink with ID:', id);
+
     const drinksManager = new DrinksManager();
-    const fileData = drinksManager.getAllDrinks();
-    console.log(fileData)
+    const { name, category, ingredients, glass, alcoholContent, allergens } = req.body;
+
+    const updatedDrinkDetails = {
+        name,
+        category,
+        ingredients,
+        glass,
+        alcoholContent,
+        allergens,
+    };
+
     try {
-        const drinkIndex = fileData.findIndex(drink => drink.id === id);
+        const updatedDrink = drinksManager.updateDrink(id, updatedDrinkDetails);
 
-        console.log('File data:', fileData);
-        console.log('Drink index:', drinkIndex);
-
-        const { name, category, ingredients, glass, alcoholContent, allergens } = req.body;
-        fileData[drinkIndex] = {
-            ...fileData[drinkIndex],
-            name,
-            category,
-            ingredients,
-            glass,
-            alcoholContent,
-            allergens
-        };
-
-        if (drinkIndex === -1) {
-            return res.status(404).json({ message: 'Drink not found' });
-        }
-        const validationError = validateDrinkFields(req.body);
-        if (validationError) {
-            return res.status(400).json({ message: validationError });
-        }
-
-
-        writeJSONFile(drinksManager.getFilePath(), fileData);
-        res.status(200).json({ message: 'Drink updated successfully', drink: fileData.drinks[drinkIndex] });
-
+        res.status(200).json({
+            message: 'Drink updated successfully',
+            drink: updatedDrink
+        });
     } catch (error) {
         console.error("Error updating drink:", error);
-        res.status(500).json({ message: 'Internal server error', error: error.message });
+
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message
+        });
     }
 });
-
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
