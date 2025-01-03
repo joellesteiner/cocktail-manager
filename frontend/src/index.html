@@ -1,0 +1,54 @@
+</head>
+<body>
+<header>
+    <div class="container">
+        <h1>Drink Manager</h1>
+    </div>
+</header>
+
+<main>
+    <section id="drinks-manager">
+        <div class="container">
+            <div class="split-container">
+                <div id="drink-form">
+                    <h2>Add a New Drink</h2>
+                    <form id="add-drink-form" class="form">
+                        <input type="text" id="drink-name" placeholder="Name" required class="input-field">
+                        <select id="drink-category" class="input-field">
+                            <option value="cocktail">Cocktail</option>
+                            <option value="mocktail">Mocktail</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <input type="text" id="drink-ingredients" placeholder="Ingredients (comma-separated)" required class="input-field">
+                        <input type="text" id="drink-glass" placeholder="Glass Type" required class="input-field">
+                        <input type="number" id="drink-alcohol" placeholder="Alcohol Content (%)" required class="input-field">
+                        <button type="submit" class="btn">Add Drink</button>
+                    </form>
+                </div>
+
+                <div id="drinks-list">
+                    <h2>Drinks List</h2>
+                    <div id="filters">
+                        <input type="text" id="search-bar" placeholder="Search drinks..." class="input-field">
+                        <select id="category-filter" class="input-field">
+                            <option value="">All Categories</option>
+                            <option value="cocktail">Cocktail</option>
+                            <option value="mocktail">Mocktail</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div id="drinks-container" class="drink-cards"></div>
+                    <div id="pagination" class="pagination">
+                        <button id="prev-page" disabled>Previous</button>
+                        <span id="current-page">1</span>
+                        <button id="next-page">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div id="root"></div>
+</body>
+</html>

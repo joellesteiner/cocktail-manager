@@ -1,20 +1,6 @@
 {
   "drinks": [
     {
-      "name": "amaretto sour",
-      "category": "cocktail",
-      "ingredients": [
-        "Ingredient 1",
-        "Ingredient 2"
-      ],
-      "glass": "Cocktail glass",
-      "alcoholContent": 10,
-      "id": "ec052de1-297e-4b6a-817b-874b49a92bff",
-      "allergens": [
-        "egg"
-      ]
-    },
-    {
       "name": "passionfruit martini",
       "category": "cocktail",
       "ingredients": [
