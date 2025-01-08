@@ -2,7 +2,7 @@
   "drinks": [
     {
       "name": "passionfruit martini",
-      "category": "cocktail",
+      "category": "mocktail",
       "ingredients": [
         "Ingredient 1",
         "Ingredient 2"
@@ -13,37 +13,6 @@
         "none"
       ],
       "id": "1f3b3be0-c4f9-4030-b121-b7c253d92da4"
-    },
-    {
-      "name": "pineapple",
-      "category": "other",
-      "ingredients": [
-        "Pineapple",
-        "Water",
-        "Sugar",
-        "Banana"
-      ],
-      "glass": "Smoothie glass",
-      "alcoholContent": 0,
-      "allergens": [
-        "None"
-      ],
-      "id": "b047cfa0-a618-412a-a661-9d3b32fc7d89"
-    },
-    {
-      "name": "pina colada",
-      "category": "cocktail",
-      "ingredients": [
-        "coconut cream",
-        "rum",
-        "pineapple juice"
-      ],
-      "glass": "Poco Grande glass",
-      "alcoholContent": 13,
-      "allergens": [
-        "none"
-      ],
-      "id": "8dde7c00-83d1-4392-82d0-8bdf22b7f22b"
     },
     {
       "name": "espresso martini",

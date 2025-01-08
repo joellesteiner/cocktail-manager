@@ -1,54 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drink Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #ddd;
+        }
+
+        .form-container {
+            margin: 20px auto;
+            max-width: 400px;
+            text-align: left;
+        }
+
+        .form-container label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        .form-container input, .form-container select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .content {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+        }
+
+        .drink-list {
+            max-width: 400px;
+        }
+
+        .chart {
+            max-width: 400px;
+        }
+
+        .drink-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .chart canvas {
+            margin: 0 auto;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+    </style>
 </head>
 <body>
-<header>
-    <div class="container">
-        <h1>Drink Manager</h1>
-    </div>
-</header>
+<!-- Landing Page -->
+<div id="landing-page" class="container">
+    <h1>Welcome to Drink Manager</h1>
+    <button class="button" onclick="showPage('admin-page')">Go to Admin Page</button>
+    <button class="button" onclick="showPage('customer-page')">Go to Customer Page</button>
+</div>
 
-<main>
-    <section id="drinks-manager">
-        <div class="container">
-            <div class="split-container">
-                <div id="drink-form">
-                    <h2>Add a New Drink</h2>
-                    <form id="add-drink-form" class="form">
-                        <input type="text" id="drink-name" placeholder="Name" required class="input-field">
-                        <select id="drink-category" class="input-field">
-                            <option value="cocktail">Cocktail</option>
-                            <option value="mocktail">Mocktail</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <input type="text" id="drink-ingredients" placeholder="Ingredients (comma-separated)" required class="input-field">
-                        <input type="text" id="drink-glass" placeholder="Glass Type" required class="input-field">
-                        <input type="number" id="drink-alcohol" placeholder="Alcohol Content (%)" required class="input-field">
-                        <button type="submit" class="btn">Add Drink</button>
-                    </form>
-                </div>
+<!-- Admin Page -->
+<div id="admin-page" class="container hidden">
+    <h1>Admin Page</h1>
+    <button class="button" onclick="showPage('landing-page')">Back to Home</button>
 
-                <div id="drinks-list">
-                    <h2>Drinks List</h2>
-                    <div id="filters">
-                        <input type="text" id="search-bar" placeholder="Search drinks..." class="input-field">
-                        <select id="category-filter" class="input-field">
-                            <option value="">All Categories</option>
-                            <option value="cocktail">Cocktail</option>
-                            <option value="mocktail">Mocktail</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div id="drinks-container" class="drink-cards"></div>
-                    <div id="pagination" class="pagination">
-                        <button id="prev-page" disabled>Previous</button>
-                        <span id="current-page">1</span>
-                        <button id="next-page">Next</button>
-                    </div>
-                </div>
-            </div>
+    <form id="drink-form" class="form-container">
+        <label for="drink-name">Drink Name:</label>
+        <input type="text" id="drink-name" placeholder="Enter drink name">
+
+        <label for="category">Category:</label>
+        <select id="category">
+            <option value="">Select a category</option>
+            <option value="cocktail">Cocktail</option>
+            <option value="mocktail">Mocktail</option>
+            <option value="other">Other</option>
+        </select>
+
+        <label for="ingredients">Ingredients (comma-separated):</label>
+        <input type="text" id="ingredients" placeholder="e.g., vodka, lime, soda">
+
+        <label for="glass">Glass Type:</label>
+        <input type="text" id="glass" placeholder="e.g., Highball">
+
+        <label for="alcohol-content">Alcohol Content (%):</label>
+        <input type="number" id="alcohol-content" placeholder="Enter alcohol content">
+
+        <label for="allergens">Allergens (comma-separated):</label>
+        <input type="text" id="allergens" placeholder="e.g., gluten, nuts">
+
+        <button type="button" class="button" onclick="handleSubmit()">Add Drink</button>
+    </form>
+
+    <div class="content">
+        <div class="drink-list">
+            <h2>Drink List</h2>
+            <div id="drinks-container"></div>
         </div>
-    </section>
-</main>
 
-<div id="root"></div>
+        <div class="chart">
+            <h2>Drink Category Distribution</h2>
+            <canvas id="chart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Customer Page -->
+<div id="customer-page" class="container hidden">
+    <h1>Customer Page</h1>
+    <button class="button" onclick="showPage('landing-page')">Back to Home</button>
+
+    <div id="customer-drink-list">
+        <h2>Menu</h2>
+        <div id="customer-drinks-container"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const drinks = [];
+    const colors = ['#f39c12', '#2ecc71', '#8295c5'];
+
+    function showPage(pageId) {
+        document.querySelectorAll('.container').forEach(page => page.classList.add('hidden'));
+        document.getElementById(pageId).classList.remove('hidden');
+
+        if (pageId === 'customer-page') {
+            renderCustomerDrinkList();
+        } else if (pageId === 'admin-page') {
+            renderChart();
+            renderDrinkList();
+        }
+    }
+
+    function handleSubmit() {
+        const name = document.getElementById('drink-name').value;
+        const category = document.getElementById('category').value;
+        const ingredients = document.getElementById('ingredients').value;
+        const glass = document.getElementById('glass').value;
+        const alcoholContent = document.getElementById('alcohol-content').value;
+        const allergens = document.getElementById('allergens').value;
+
+        if (!name || !category || !ingredients || !glass) {
+            alert('All fields are required.');
+            return;
+        }
+
+        drinks.push({ name, category, ingredients, glass, alcoholContent, allergens });
+        renderDrinkList();
+        renderChart();
+        clearForm();
+    }
+
+    function clearForm() {
+        document.getElementById('drink-form').reset();
+    }
+
+    function renderDrinkList() {
+        const container = document.getElementById('drinks-container');
+        container.innerHTML = '';
+        drinks.forEach((drink, index) => {
+            const div = document.createElement('div');
+            div.className = 'drink-item';
+            div.innerHTML = `
+                    <span>${drink.name} (${drink.category})</span>
+                    <button onclick="deleteDrink(${index})">Delete</button>
+                `;
+            container.appendChild(div);
+        });
+    }
+
+    function deleteDrink(index) {
+        drinks.splice(index, 1);
+        renderDrinkList();
+        renderChart();
+    }
+
+    function renderChart() {
+        const categories = { cocktail: 0, mocktail: 0, other: 0 };
+        drinks.forEach(drink => categories[drink.category]++);
+
+        const data = {
+            labels: ['Cocktails', 'Mocktails', 'Other'],
+            datasets: [{
+                data: [categories.cocktail, categories.mocktail, categories.other],
+                backgroundColor: colors,
+            }]
+        };
+
+        const ctx = document.getElementById('chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data,
+        });
+    }
+
+    function renderCustomerDrinkList() {
+        const container = document.getElementById('customer-drinks-container');
+        container.innerHTML = '';
+        drinks.forEach(drink => {
+            const div = document.createElement('div');
+            div.className = 'drink-item';
+            div.innerHTML = `<span>${drink.name} (${drink.category})</span>`;
+            container.appendChild(div);
+        });
+    }
+</script>
 </body>
 </html>
+

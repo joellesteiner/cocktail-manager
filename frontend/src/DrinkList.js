@@ -1,51 +1,91 @@
 import React, { useState } from 'react';
 
-const DrinkList = ({ drinks, onDelete, onEdit }) => {
+const DrinkList = ({ drinks, onDelete, onEdit, isAdmin }) => {
     const [currentCategory, setCurrentCategory] = useState("");
 
     const handleDeleteClick = (id) => {
-        console.log(`Attempting to delete drink with ID: ${id}`);
-        if (id) {
+        if (id && onDelete) {
             onDelete(id);
         } else {
-            console.log("No ID found for this drink");
+            console.error("No ID found for this drink.");
         }
     };
+
+    const handleEditClick = (drink) => {
+        if (drink && onEdit) {
+            onEdit(id);
+        } else {
+            console.error("No drink found.");
+        }
+    };
+
+
 
     const handleCategoryChange = (event) => {
         setCurrentCategory(event.target.value);
     };
 
-    const filterDrinks = (drink) => {
-        console.log(drink.category, currentCategory);
-        return currentCategory === "" || drink.category === currentCategory;
-    };
+    const filteredDrinks = drinks.filter(
+        (drink) => currentCategory === "" || drink.category === currentCategory
+    );
 
-    const categories = ['cocktail', 'mocktail', 'other'];
+    const categories = ["cocktail", "mocktail", "other"];
 
     return (
-        <div>
+        <div className="drink-list">
             <h2>Drinks List</h2>
-            <select
-                value={currentCategory}
-                onChange={handleCategoryChange}
-            >
-                <option value="">Select a category</option>
-                {categories.map((cat) => (
-                    <option key={cat} value={cat}>
-                        {cat}
-                    </option>
-                ))}
-            </select>
+
+            {/* Category Selector */}
+            {isAdmin && (
+                <div className="category-filter">
+                    <label htmlFor="category-select">Filter by Category: </label>
+                    <select
+                        id="category-select"
+                        value={currentCategory}
+                        onChange={handleCategoryChange}
+                    >
+                        <option value="">All Categories</option>
+                        {categories.map((cat) => (
+                            <option key={cat} value={cat}>
+                                {cat}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            )}
+
+            {/* Drinks List */}
             <ul>
-                {drinks.length === 0 ? (
-                    <li>No drinks available. Please add some drinks!</li>
+                {filteredDrinks.length === 0 ? (
+                    <li>No drinks available in this category.</li>
                 ) : (
-                    drinks.filter(filterDrinks).map((drink) => (
-                        <li key={drink.id}>
-                            <strong>{drink.name}</strong> ({drink.category})
-                            <button onClick={() => handleDeleteClick(drink.id)}>Delete</button>
-                            <button onClick={() => onEdit(drink)}>Edit</button>
+                    filteredDrinks.map((drink) => (
+                        <li key={drink.id} className="drink-item">
+                            <div>
+                                <strong>{drink.name}</strong> ({drink.category})
+                                <br />
+                                <span>Ingredients: {drink.ingredients?.join(", ")}</span>
+                                <br />
+                                <span>Glass: {drink.glass}</span>
+                                <br />
+                                <span>Alcohol Content: {drink.alcoholContent}%</span>
+                                <br />
+                                <span>Allergens: {drink.allergens?.join(", ") || "None"}</span>
+                            </div>
+
+                            {isAdmin && (
+                                <div className="admin-controls">
+                                    <div className="button-group">
+                                        <button className="edit-button" onClick={() => handleEditClick(drink)}>
+                                            Edit
+                                        </button>
+                                        <button className="delete-button" onClick={() => handleDeleteClick(drink.id)}>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
                         </li>
                     ))
                 )}
