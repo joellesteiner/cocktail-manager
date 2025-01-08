@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DrinkList from './DrinkList.js';
+import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts'; // Import from Recharts
 import './App.css';
 
-const AdminPage = ({goToHome, fetchDrinks, setDrinks, drinks}) => {
-
+const AdminPage = ({ goToHome, fetchDrinks, setDrinks, drinks }) => {
     const [drinkName, setDrinkName] = useState('');
     const [category, setCategory] = useState('');
     const [ingredients, setIngredients] = useState('');
@@ -16,11 +16,16 @@ const AdminPage = ({goToHome, fetchDrinks, setDrinks, drinks}) => {
 
     const categories = ['cocktail', 'mocktail', 'other'];
 
-    const handleCategoryChange = (event) => {
-        const selectedCategory = event.target.value;
-        setCategory(selectedCategory);
-        fetchDrinks(selectedCategory);
+    // Calculate data for Pie Chart
+    const getCategoryData = () => {
+        const categoryCount = categories.map((cat) => ({
+            name: cat,
+            value: drinks.filter((drink) => drink.category === cat).length,
+        }));
+        return categoryCount.filter((data) => data.value > 0); // Exclude empty categories
     };
+
+    const pieColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']; // Define colors for categories
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -41,10 +46,8 @@ const AdminPage = ({goToHome, fetchDrinks, setDrinks, drinks}) => {
 
         try {
             if (editMode && currentDrink) {
-                // Update existing drink
                 await axios.put(`http://localhost:3001/api/drinks/${currentDrink.id}`, drinkData);
             } else {
-                // Add new drink
                 await axios.post('http://localhost:3001/api/drinks', drinkData);
             }
             await fetchDrinks();
@@ -58,28 +61,22 @@ const AdminPage = ({goToHome, fetchDrinks, setDrinks, drinks}) => {
         try {
             await axios.delete(`http://localhost:3001/api/drinks/${id}`);
             setDrinks((prevDrinks) => prevDrinks.filter((drink) => drink.id !== id));
-            console.log('Drink deleted successfully');
         } catch (error) {
             console.error('Error deleting drink:', error.message);
         }
     };
 
     const handleEdit = (drink) => {
-        const ingredientsArray = Array.isArray(drink.ingredients) ? drink.ingredients : [];
-        const allergensArray = Array.isArray(drink.allergens) ? drink.allergens : [];
-
         setDrinkName(drink.name);
         setCategory(drink.category);
-        setIngredients(ingredientsArray.join(', '));
+        setIngredients(drink.ingredients.join(', '));
         setGlass(drink.glass);
         setAlcoholContent(drink.alcoholContent.toString());
-        setAllergens(allergensArray.join(', '));
-
+        setAllergens(drink.allergens.join(', '));
         setEditMode(true);
         setCurrentDrink(drink);
     };
 
-    // Clear the form for adding new drink
     const clearForm = () => {
         setDrinkName('');
         setCategory('');
@@ -96,6 +93,7 @@ const AdminPage = ({goToHome, fetchDrinks, setDrinks, drinks}) => {
             <button onClick={goToHome}>Go Home</button>
             <h1>Drink Manager</h1>
 
+            {/* Drink Form */}
             <form onSubmit={handleSubmit}>
                 <label>Drink Name:</label>
                 <input
@@ -105,10 +103,7 @@ const AdminPage = ({goToHome, fetchDrinks, setDrinks, drinks}) => {
                 />
 
                 <label>Category:</label>
-                <select
-                    value={category}
-                    onChange={handleCategoryChange}
-                >
+                <select value={category} onChange={(e) => setCategory(e.target.value)}>
                     <option value="">Select a category</option>
                     {categories.map((cat) => (
                         <option key={cat} value={cat}>
@@ -148,6 +143,7 @@ const AdminPage = ({goToHome, fetchDrinks, setDrinks, drinks}) => {
                 <button type="submit">{editMode ? 'Update Drink' : 'Add Drink'}</button>
             </form>
 
+            {/* Drink List */}
             <DrinkList
                 drinks={drinks}
                 onDelete={handleDelete}
@@ -155,6 +151,28 @@ const AdminPage = ({goToHome, fetchDrinks, setDrinks, drinks}) => {
                 isAdmin={true}
                 currentCategory={category}
             />
+
+            {/* Pie Chart for Categories */}
+            <div style={{ marginTop: '30px' }}>
+                <h2>Drink Categories Distribution</h2>
+                <PieChart width={400} height={300}>
+                    <Pie
+                        data={getCategoryData()}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={100}
+                        fill="#8884d8"
+                    >
+                        {getCategoryData().map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
+                        ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                </PieChart>
+            </div>
         </div>
     );
 };
