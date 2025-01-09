@@ -12,7 +12,7 @@ This project is a collection manager for bartenders and drink enthusiasts. It al
 
 - **CRUD Operations**: Manage individual drink records.
 - **Category Filters**: Filter by cocktails, mocktails, or ingredients.
-- **Data Visualization**: Pie charts for drink distribution using Chart.js.
+- **Data Visualisation**: Pie charts for drink distribution using Chart.js.
 - **Responsive Design**: User-friendly and mobile-compatible interface.
 
 ## How to Run
