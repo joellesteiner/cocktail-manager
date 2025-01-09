@@ -13,7 +13,7 @@ const DrinkList = ({ drinks, onDelete, onEdit, isAdmin }) => {
 
     const handleEditClick = (drink) => {
         if (drink && onEdit) {
-            onEdit(id);
+            onEdit(drink);
         } else {
             console.error("No drink found.");
         }
@@ -36,7 +36,7 @@ const DrinkList = ({ drinks, onDelete, onEdit, isAdmin }) => {
             <h2>Drinks List</h2>
 
             {/* Category Selector */}
-            {isAdmin && (
+
                 <div className="category-filter">
                     <label htmlFor="category-select">Filter by Category: </label>
                     <select
@@ -52,7 +52,7 @@ const DrinkList = ({ drinks, onDelete, onEdit, isAdmin }) => {
                         ))}
                     </select>
                 </div>
-            )}
+
 
             {/* Drinks List */}
             <ul>

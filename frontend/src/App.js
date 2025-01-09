@@ -21,6 +21,7 @@ const App = () => {
         loadDrinks();
     }, []);
 
+
     const fetchDrinks = async (category = '') => {
         try {
             const url = category

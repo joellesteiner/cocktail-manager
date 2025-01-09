@@ -75,6 +75,7 @@ const AdminPage = ({ goToHome, fetchDrinks, setDrinks, drinks }) => {
         setAllergens(drink.allergens.join(', '));
         setEditMode(true);
         setCurrentDrink(drink);
+        console.log(drink)
     };
 
     const clearForm = () => {

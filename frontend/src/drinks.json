@@ -30,6 +30,35 @@
         ""
       ],
       "id": "b3a13828-3d20-41ba-a00f-0cac5d85d458"
-    }
-  ]
+    },
+        {
+          "name": "Mango Tango",
+          "category": "cocktail",
+          "ingredients": ["Mango Juice", "Rum", "Lime", "Mint"],
+          "glass": "Highball Glass",
+          "alcoholContent": 18,
+          "allergens": ["none"],
+          "id": "f2f7d3f9-cf6e-44ed-9d19-55faff24119e"
+        },
+        {
+          "name": "Citrus Cooler",
+          "category": "cocktail",
+          "ingredients": ["Orange Juice", "Vodka", "Lemon", "Ice"],
+          "glass": "Margarita Glass",
+          "alcoholContent": 15,
+          "allergens": ["none"],
+          "id": "2b34a62d-2d8e-40d9-92e2-b86ec124601b"
+        },
+        {
+          "name": "Berry Burst",
+          "category": "mocktail",
+          "ingredients": ["Mixed Berries", "Lemonade", "Mint Leaves"],
+          "glass": "Collins Glass",
+          "alcoholContent": 0,
+          "allergens": ["none"],
+          "id": "f8e8b4b2-efbe-4be1-bae9-438aaad22088"
+        }
+
+
+        ]
 }
