@@ -17,8 +17,13 @@ This project is a collection manager for bartenders and drink enthusiasts. It al
 
 ## How to Run
 
-1. Clone this repository:
-2. Open `index.html` in a browser to view the application.
+1. Clone this repository.
+2. In main directory, run npm i, to install dependencies.
+3. Run npm run test to run tests.
+4. Run node server.js AFTER testing to start server.
+5. Run cd ./frontend to move to the frontend directory.
+6. Run npm start to start the react application.
+7. Visit localhost:3000 on your machine to view the running application.
 
 ## Future Enhancements
 
