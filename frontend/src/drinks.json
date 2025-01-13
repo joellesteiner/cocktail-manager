@@ -258,6 +258,18 @@
         "none"
       ],
       "id": "mnop3456-7890-12ab-cdef-1234567890ab"
+    },
+    {
+      "name": "mocktail",
+      "category": "mocktail",
+      "ingredients": [
+        "water",
+        "sugar"
+      ],
+      "glass": "Glass",
+      "alcoholContent": 0,
+      "allergens": [],
+      "id": "c47baf00-1d5c-4f37-bac6-3f4667e55ab4"
     }
   ]
 }

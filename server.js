@@ -1,48 +1,43 @@
-import express from 'express';
-import path from 'path';
-import { readFileSync } from 'node:fs';
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { Drink, CategoryManager, DrinksManager } from './frontend/src/drinkForm.js';
-import { v4 as uuidv4 } from 'uuid';
-import cors from 'cors';
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+const { Drink, CategoryManager, DrinksManager } = require('./frontend/src/drinkForm.js');
+const { v4: uuidv4 } = require('uuid');
+const cors = require('cors');
+const filePath = path.join(__dirname, 'frontend', 'src', 'drinks.json');
 
 
 const app = express();
-module.exports = app;
-
 const port = 3001;
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 app.use(cors({
     origin: ['http://localhost:3000'],
     methods: ['GET', 'POST', 'DELETE', 'PUT'],
 }));
-
 app.use(express.json());
 app.use((req, res, next) => {
     console.log(`[${req.method}] ${req.path} Received request`);
     next();
 });
 
+// Utility: Read JSON file
 const readJSONFile = (filePath) => {
     try {
-        const data = readFileSync(filePath, 'utf8');
+        // Correct file path
+        const data = fs.readFileSync(filePath, 'utf8');
         if (!data) {
-            console.warn('File is empty, initialising w/ default structure.');
+            console.warn('File is empty, initializing with default structure.');
             return { drinks: [] };
         }
-        console.log(data)
         return JSON.parse(data);
     } catch (error) {
         console.error('Error reading or parsing JSON file:', error.message);
         console.warn('Reinitializing file with default structure.');
         return { drinks: [] };
     }
-
 };
 
-
+// Utility: Validate drink fields
 const validateDrinkFields = (fields) => {
     const { name, category, ingredients, glass, alcoholContent, allergens } = fields;
     if (!name || !category || !ingredients || !glass || alcoholContent === undefined || allergens === undefined) {
@@ -58,6 +53,7 @@ const validateDrinkFields = (fields) => {
     return null;
 };
 
+// Routes
 app.get('/api/drinks', (req, res) => {
     try {
         const drinksManager = new DrinksManager();
@@ -71,7 +67,6 @@ app.get('/api/drinks', (req, res) => {
         res.status(500).json({ message: 'Error fetching drinks', error: error.message });
     }
 });
-
 
 app.get('/api/drinks/category/:category', (req, res) => {
     try {
@@ -89,7 +84,6 @@ app.get('/api/drinks/category/:category', (req, res) => {
     }
 });
 
-// GET /api/drinks/:id
 app.get('/api/drinks/:id', (req, res) => {
     const id = req.params.id;
     const filePath = path.join(__dirname, 'drinks.json');
@@ -99,8 +93,6 @@ app.get('/api/drinks/:id', (req, res) => {
         const drink = myData.drinks.find(drink => drink.id === id);
 
         if (!drink) {
-            console.log("Drink not found for ID:", id);
-            console.log("Returning 404 response:", { message: 'Drink not found' }); // Log the response body
             return res.status(404).json({ message: 'Drink not found' });
         }
         res.status(200).json({ message: 'Drink found', drink });
@@ -108,18 +100,12 @@ app.get('/api/drinks/:id', (req, res) => {
         console.error("Error retrieving drink by ID:", error);
         res.status(404).json({ message: "Error retrieving drink by ID", error: error.message });
     }
-
-
 });
 
-
-
 app.post('/api/drinks', (req, res) => {
-    console.log('[POST] /api/drinks - Request Body:', req.body);
     try {
         const validationError = validateDrinkFields(req.body);
         if (validationError) {
-            console.error('Validation Error:', validationError);
             return res.status(400).json({ message: validationError });
         }
 
@@ -129,7 +115,6 @@ app.post('/api/drinks', (req, res) => {
 
         const drinksManager = new DrinksManager();
         if (drinksManager.findDuplicate(newDrink)) {
-            console.error('Duplicate Drink Error');
             return res.status(400).json({ message: "Drink already exists in this category." });
         }
 
@@ -145,17 +130,11 @@ app.delete('/api/drinks/:id', (req, res) => {
     try {
         const id = req.params.id;
 
-        if (!isValidId(id)) {
-            return res.status(400).json({ message: "Invalid ID format" });
-        }
-
-        console.log(`Deleting drink with ID: ${id}`);
-
         const drinksManager = new DrinksManager();
         const removedDrink = drinksManager.removeDrink(id);
 
         if (!removedDrink) {
-            return res.status(404).json({ message: "Drink not found" });  // Ensure this line is sending the response correctly
+            return res.status(404).json({ message: "Drink not found" });
         }
 
         res.status(200).json({ id, message: "Drink removed successfully!" });
@@ -165,14 +144,8 @@ app.delete('/api/drinks/:id', (req, res) => {
     }
 });
 
-function isValidId(id) {
-    return /^\d+$/.test(id);
-}
-
-
 app.put('/api/drinks/:id', (req, res) => {
     const id = req.params.id;
-    console.log('Updating drink with ID:', id);
 
     const drinksManager = new DrinksManager();
     const { name, category, ingredients, glass, alcoholContent, allergens } = req.body;
@@ -188,14 +161,12 @@ app.put('/api/drinks/:id', (req, res) => {
 
     try {
         const updatedDrink = drinksManager.updateDrink(id, updatedDrinkDetails);
-
         res.status(200).json({
             message: 'Drink updated successfully',
             drink: updatedDrink
         });
     } catch (error) {
         console.error("Error updating drink:", error);
-
         res.status(500).json({
             message: error.message || 'Internal server error',
             error: error.message
@@ -203,9 +174,8 @@ app.put('/api/drinks/:id', (req, res) => {
     }
 });
 
-export { app };
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
-    app.use(express.json());
 });
-module.exports = { readJSONFile };
+
+module.exports = { app, readJSONFile };

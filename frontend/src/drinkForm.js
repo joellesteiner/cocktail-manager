@@ -1,9 +1,7 @@
 import path from "path";
 import {readFileSync, writeFileSync} from "node:fs";
-import {fileURLToPath} from "node:url";
-import {dirname} from 'path';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+
 
 export class Drink {
 
