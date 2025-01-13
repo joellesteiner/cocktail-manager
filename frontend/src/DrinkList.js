@@ -35,7 +35,6 @@ const DrinkList = ({ drinks, onDelete, onEdit, isAdmin }) => {
         <div className="drink-list">
             <h2>Drinks List</h2>
 
-            {/* Category Selector */}
 
                 <div className="category-filter">
                     <label htmlFor="category-select">Filter by Category: </label>
@@ -54,7 +53,6 @@ const DrinkList = ({ drinks, onDelete, onEdit, isAdmin }) => {
                 </div>
 
 
-            {/* Drinks List */}
             <ul>
                 {filteredDrinks.length === 0 ? (
                     <li>No drinks available in this category.</li>

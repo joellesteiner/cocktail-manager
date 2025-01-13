@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import React, {useEffect, useState} from 'react';
 import AdminPage from './adminPage.js';
 import CustomerPage from './customerPage.js';
@@ -22,12 +24,9 @@ const App = () => {
     }, []);
 
 
-    const fetchDrinks = async (category = '') => {
+    const fetchDrinks = async () => {
         try {
-            const url = category
-                ? `http://localhost:3001/api/drinks/category/${category}`
-                : 'http://localhost:3001/api/drinks';
-            const response = await axios.get(url);
+            const response = await axios.get('http://localhost:3001/api/drinks');
             setDrinks(response.data.drinks || []);
         } catch (error) {
             console.error('Error fetching drinks:', error.message);

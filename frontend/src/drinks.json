@@ -1,64 +1,263 @@
 {
   "drinks": [
     {
-      "name": "passionfruit martini",
-      "category": "mocktail",
+      "name": "Passionfruit Martini",
+      "category": "cocktail",
       "ingredients": [
-        "Ingredient 1",
-        "Ingredient 2"
+        "Passionfruit puree",
+        "Vanilla syrup",
+        "Lime juice",
+        "Ice",
+        "Vodka"
       ],
       "glass": "Cocktail glass",
-      "alcoholContent": 23,
+      "alcoholContent": 16,
       "allergens": [
         "none"
       ],
       "id": "1f3b3be0-c4f9-4030-b121-b7c253d92da4"
     },
     {
-      "name": "espresso martini",
+      "name": "Espresso Martini",
       "category": "cocktail",
       "ingredients": [
-        "espresso",
+        "Espresso",
         "Vodka",
         "Coffee liqueur",
         "Simple syrup",
         "Ice"
       ],
       "glass": "Cocktail glass",
-      "alcoholContent": 0,
+      "alcoholContent": 22,
       "allergens": [
-        ""
+        "none"
       ],
       "id": "b3a13828-3d20-41ba-a00f-0cac5d85d458"
     },
-        {
-          "name": "Mango Tango",
-          "category": "cocktail",
-          "ingredients": ["Mango Juice", "Rum", "Lime", "Mint"],
-          "glass": "Highball Glass",
-          "alcoholContent": 18,
-          "allergens": ["none"],
-          "id": "f2f7d3f9-cf6e-44ed-9d19-55faff24119e"
-        },
-        {
-          "name": "Citrus Cooler",
-          "category": "cocktail",
-          "ingredients": ["Orange Juice", "Vodka", "Lemon", "Ice"],
-          "glass": "Margarita Glass",
-          "alcoholContent": 15,
-          "allergens": ["none"],
-          "id": "2b34a62d-2d8e-40d9-92e2-b86ec124601b"
-        },
-        {
-          "name": "Berry Burst",
-          "category": "mocktail",
-          "ingredients": ["Mixed Berries", "Lemonade", "Mint Leaves"],
-          "glass": "Collins Glass",
-          "alcoholContent": 0,
-          "allergens": ["none"],
-          "id": "f8e8b4b2-efbe-4be1-bae9-438aaad22088"
-        }
-
-
-        ]
+    {
+      "name": "Mango Tango",
+      "category": "cocktail",
+      "ingredients": [
+        "Mango juice",
+        "Rum",
+        "Lime juice",
+        "Mint leaves",
+        "Ice"
+      ],
+      "glass": "Highball glass",
+      "alcoholContent": 18,
+      "allergens": [
+        "none"
+      ],
+      "id": "f2f7d3f9-cf6e-44ed-9d19-55faff24119e"
+    },
+    {
+      "name": "Citrus Cooler",
+      "category": "cocktail",
+      "ingredients": [
+        "Orange juice",
+        "Vodka",
+        "Lemon juice",
+        "Ice"
+      ],
+      "glass": "Margarita glass",
+      "alcoholContent": 15,
+      "allergens": [
+        "none"
+      ],
+      "id": "2b34a62d-2d8e-40d9-92e2-b86ec124601b"
+    },
+    {
+      "name": "Berry Burst",
+      "category": "mocktail",
+      "ingredients": [
+        "Mixed berries",
+        "Lemonade",
+        "Mint leaves",
+        "Ice"
+      ],
+      "glass": "Collins glass",
+      "alcoholContent": 0,
+      "allergens": [
+        "none"
+      ],
+      "id": "f8e8b4b2-efbe-4be1-bae9-438aaad22088"
+    },
+    {
+      "name": "Mojito",
+      "category": "cocktail",
+      "ingredients": [
+        "White rum",
+        "Fresh mint leaves",
+        "Lime wedges",
+        "Sugar",
+        "Soda water",
+        "Crushed ice"
+      ],
+      "glass": "Highball glass",
+      "alcoholContent": 10,
+      "allergens": [
+        "none"
+      ],
+      "id": "34742e35-08cd-402b-a724-b9790e96f2e5"
+    },
+    {
+      "name": "Pineapple Juice",
+      "category": "other",
+      "ingredients": [
+        "Fresh pineapple",
+        "Sugar",
+        "Lime juice",
+        "Water"
+      ],
+      "glass": "Tall glass",
+      "alcoholContent": 0,
+      "allergens": [
+        "none"
+      ],
+      "id": "45faa115-d116-45f7-8915-291b1e246b5d"
+    },
+    {
+      "name": "Strawberry Daiquiri",
+      "category": "cocktail",
+      "ingredients": [
+        "Strawberries",
+        "White rum",
+        "Lime juice",
+        "Sugar",
+        "Ice"
+      ],
+      "glass": "Hurricane glass",
+      "alcoholContent": 14,
+      "allergens": [
+        "Strawberries"
+      ],
+      "id": "7a831f3e-cd1d-4377-a49c-2fb5a3efbd81"
+    },
+    {
+      "name": "Virgin Mojito",
+      "category": "mocktail",
+      "ingredients": [
+        "Fresh mint leaves",
+        "Lime wedges",
+        "Sugar",
+        "Soda water",
+        "Crushed ice"
+      ],
+      "glass": "Highball glass",
+      "alcoholContent": 0,
+      "allergens": [
+        "none"
+      ],
+      "id": "a9b334c2-01d2-4f0c-8a93-dbe7f72a1d4d"
+    },
+    {
+      "name": "Blue Lagoon",
+      "category": "cocktail",
+      "ingredients": [
+        "Vodka",
+        "Blue curaçao",
+        "Lemonade",
+        "Ice"
+      ],
+      "glass": "Pilsner glass",
+      "alcoholContent": 16,
+      "allergens": [
+        "none"
+      ],
+      "id": "5d422f86-88b2-44c7-9c7d-e9379a7a875c"
+    },
+    {
+      "name": "Minty Berry Fizz",
+      "category": "mocktail",
+      "ingredients": [
+        "Mixed berries",
+        "Mint leaves",
+        "Lemon juice",
+        "Sparkling water",
+        "Ice"
+      ],
+      "glass": "Collins glass",
+      "alcoholContent": 0,
+      "allergens": [
+        "none"
+      ],
+      "id": "c1a5f62a-5e2d-4234-9f15-20df737ad4ef"
+    },
+    {
+      "name": "Tequila Sunrise",
+      "category": "cocktail",
+      "ingredients": [
+        "Tequila",
+        "Orange juice",
+        "Grenadine",
+        "Ice"
+      ],
+      "glass": "Highball glass",
+      "alcoholContent": 13,
+      "allergens": [
+        "none"
+      ],
+      "id": "d8c417c5-c7b1-43b9-9cf7-ecb9f23a017b"
+    },
+    {
+      "name": "Orange Juice",
+      "category": "other",
+      "ingredients": [
+        "Fresh oranges",
+        "Ice"
+      ],
+      "glass": "Tall glass",
+      "alcoholContent": 0,
+      "allergens": [
+        "none"
+      ],
+      "id": "abcd1234-5678-90ab-cdef-1234567890ab"
+    },
+    {
+      "name": "Apple Juice",
+      "category": "other",
+      "ingredients": [
+        "Fresh apples",
+        "Water",
+        "Sugar"
+      ],
+      "glass": "Short glass",
+      "alcoholContent": 0,
+      "allergens": [
+        "none"
+      ],
+      "id": "efgh5678-1234-90ab-cdef-1234567890ab"
+    },
+    {
+      "name": "Carrot Juice",
+      "category": "other",
+      "ingredients": [
+        "Fresh carrots",
+        "Lemon juice",
+        "Ice"
+      ],
+      "glass": "Highball glass",
+      "alcoholContent": 0,
+      "allergens": [
+        "none"
+      ],
+      "id": "ijkl9012-3456-78ab-cdef-1234567890ab"
+    },
+    {
+      "name": "Grape Juice",
+      "category": "other",
+      "ingredients": [
+        "Fresh grapes",
+        "Water",
+        "Sugar"
+      ],
+      "glass": "Wine glass",
+      "alcoholContent": 0,
+      "allergens": [
+        "none"
+      ],
+      "id": "mnop3456-7890-12ab-cdef-1234567890ab"
+    }
+  ]
 }

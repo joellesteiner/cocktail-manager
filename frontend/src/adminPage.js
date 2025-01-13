@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DrinkList from './DrinkList.js';
-import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts'; // Import from Recharts
+import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 import './App.css';
 
 const AdminPage = ({ goToHome, fetchDrinks, setDrinks, drinks }) => {
@@ -94,7 +94,6 @@ const AdminPage = ({ goToHome, fetchDrinks, setDrinks, drinks }) => {
             <button onClick={goToHome}>Go Home</button>
             <h1>Drink Manager</h1>
 
-            {/* Drink Form */}
             <form onSubmit={handleSubmit}>
                 <label>Drink Name:</label>
                 <input
@@ -144,7 +143,6 @@ const AdminPage = ({ goToHome, fetchDrinks, setDrinks, drinks }) => {
                 <button type="submit">{editMode ? 'Update Drink' : 'Add Drink'}</button>
             </form>
 
-            {/* Drink List */}
             <DrinkList
                 drinks={drinks}
                 onDelete={handleDelete}
@@ -153,7 +151,6 @@ const AdminPage = ({ goToHome, fetchDrinks, setDrinks, drinks }) => {
                 currentCategory={category}
             />
 
-            {/* Pie Chart for Categories */}
             <div style={{ marginTop: '30px' }}>
                 <h2>Drink Categories Distribution</h2>
                 <PieChart width={400} height={300}>

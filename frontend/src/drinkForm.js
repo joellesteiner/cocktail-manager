@@ -38,9 +38,7 @@ export class Drink {
         if (typeof this.alcoholContent !== "number" || this.alcoholContent < 0 || this.alcoholContent > 100) {
             throw new Error("Invalid, Alcohol content must be a number between 0 - 100");
         }
-
     }
-
 }
 
 export class CategoryManager {
@@ -101,19 +99,14 @@ export class CategoryManager {
         if (categoryDrinks) {
             this.categories[normalCategory] = categoryDrinks.filter(drink => drink.id !== id);
         }
-
     }
-
 }
 
 export class DrinksManager {
+
     constructor() {
         this.filePath = path.join(__dirname, "drinks.json");
         this.CategoryManager = new CategoryManager(this.filePath);
-    }
-
-    getFilePath() {
-        return this.filePath;
     }
 
     getAllDrinks() {
@@ -167,13 +160,18 @@ export class DrinksManager {
     updateDrink(id, updatedDrinkDetails) {
         try {
             const fileData = JSON.parse(readFileSync(this.filePath, 'utf8'));
-
             const drinkIndex = fileData.drinks.findIndex(drink => drink.id === id);
+
             if (drinkIndex === -1) {
                 throw new Error("Drink not found.");
             }
 
             const existingDrink = fileData.drinks[drinkIndex];
+
+            // Check for duplicate name in the same category
+            if (this.findDuplicate(updatedDrinkDetails, id)) {
+                throw new Error('A drink with this name already exists in the same category.');
+            }
 
             const updatedDrink = {
                 ...existingDrink,
@@ -218,12 +216,15 @@ export class DrinksManager {
         }
     }
 
-    findDuplicate(drink) {
+    findDuplicate(updatedDrink, idToExclude = null) {
         return this.getAllDrinks().some(existingDrink =>
-            existingDrink.name === drink.name &&
-            existingDrink.category === drink.category
+            existingDrink.name === updatedDrink.name &&
+            existingDrink.category === updatedDrink.category &&
+            existingDrink.id !== idToExclude // Exclude the current drink being updated
         );
     }
 }
+
+
 
 

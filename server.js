@@ -7,14 +7,16 @@ import { Drink, CategoryManager, DrinksManager } from './frontend/src/drinkForm.
 import { v4 as uuidv4 } from 'uuid';
 import cors from 'cors';
 
+
 const app = express();
+module.exports = app;
+
 const port = 3001;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 app.use(cors({
     origin: ['http://localhost:3000'],
     methods: ['GET', 'POST', 'DELETE', 'PUT'],
-    credentials: true
 }));
 
 app.use(express.json());
@@ -37,6 +39,7 @@ const readJSONFile = (filePath) => {
         console.warn('Reinitializing file with default structure.');
         return { drinks: [] };
     }
+
 };
 
 
@@ -86,6 +89,7 @@ app.get('/api/drinks/category/:category', (req, res) => {
     }
 });
 
+// GET /api/drinks/:id
 app.get('/api/drinks/:id', (req, res) => {
     const id = req.params.id;
     const filePath = path.join(__dirname, 'drinks.json');
@@ -95,14 +99,20 @@ app.get('/api/drinks/:id', (req, res) => {
         const drink = myData.drinks.find(drink => drink.id === id);
 
         if (!drink) {
+            console.log("Drink not found for ID:", id);
+            console.log("Returning 404 response:", { message: 'Drink not found' }); // Log the response body
             return res.status(404).json({ message: 'Drink not found' });
         }
         res.status(200).json({ message: 'Drink found', drink });
     } catch (error) {
         console.error("Error retrieving drink by ID:", error);
-        res.status(500).json({ message: "Error retrieving drink by ID", error: error.message });
+        res.status(404).json({ message: "Error retrieving drink by ID", error: error.message });
     }
+
+
 });
+
+
 
 app.post('/api/drinks', (req, res) => {
     console.log('[POST] /api/drinks - Request Body:', req.body);
@@ -134,13 +144,18 @@ app.post('/api/drinks', (req, res) => {
 app.delete('/api/drinks/:id', (req, res) => {
     try {
         const id = req.params.id;
+
+        if (!isValidId(id)) {
+            return res.status(400).json({ message: "Invalid ID format" });
+        }
+
         console.log(`Deleting drink with ID: ${id}`);
 
         const drinksManager = new DrinksManager();
         const removedDrink = drinksManager.removeDrink(id);
 
         if (!removedDrink) {
-            return res.status(404).json({ message: "Drink not found" });
+            return res.status(404).json({ message: "Drink not found" });  // Ensure this line is sending the response correctly
         }
 
         res.status(200).json({ id, message: "Drink removed successfully!" });
@@ -149,6 +164,11 @@ app.delete('/api/drinks/:id', (req, res) => {
         res.status(500).json({ message: "Error removing drink", error: error.message });
     }
 });
+
+function isValidId(id) {
+    return /^\d+$/.test(id);
+}
+
 
 app.put('/api/drinks/:id', (req, res) => {
     const id = req.params.id;
@@ -177,12 +197,15 @@ app.put('/api/drinks/:id', (req, res) => {
         console.error("Error updating drink:", error);
 
         res.status(500).json({
-            message: 'Internal server error',
+            message: error.message || 'Internal server error',
             error: error.message
         });
     }
 });
 
+export { app };
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
+    app.use(express.json());
 });
+module.exports = { readJSONFile };

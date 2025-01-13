@@ -13,7 +13,6 @@ const CustomerPage = ({ goToHome, drinks }) => {
             </button>
 
 
-            {/* Drink List */}
             <ul>
                 {drinks.length > 0 ? (
                     <DrinkList drinks={drinks} isAdmin={false} />
