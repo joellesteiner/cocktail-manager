@@ -9,6 +9,7 @@ export class Drink {
         if (typeof category !== 'string') {
             throw new Error("Category must be a string");
         }
+        this.name = name
         this.category = category.trim().toLowerCase();
         this.ingredients = ingredients;
         this.glass = glass;

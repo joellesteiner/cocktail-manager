@@ -55,9 +55,11 @@ describe('GET /api/drinks/:id (Edge Cases)', () => {
             alcoholContent: 0,
             allergens: ['none'],
         });
+    });
 
 
-        it('should return an error message when no drinks are available', async () => {
+
+    it('should return an error message when no drinks are available', async () => {
             const getResponse = await request(app).get('/api/drinks');
             if (getResponse.body.drinks && getResponse.body.drinks.length > 0) {
                 for (const drink of getResponse.body.drinks) {
@@ -67,8 +69,8 @@ describe('GET /api/drinks/:id (Edge Cases)', () => {
 
             const emptyGetResponse = await request(app).get('/api/drinks');
 
-            expect(emptyGetResponse.status).toBe(404); // The status should be 404 for "not found"
-            expect(emptyGetResponse.body).toHaveProperty('message', 'No drinks available'); // Proper error message
+            expect(emptyGetResponse.status).toBe(404);
+            expect(emptyGetResponse.body).toHaveProperty('message', 'No drinks available');
         });
 
 
@@ -81,7 +83,6 @@ describe('GET /api/drinks/:id (Edge Cases)', () => {
             expect(response.body).toHaveProperty('message', 'Drink not found');
         });
     });
-});
 
 
 describe('POST /api/drinks (Edge Cases)', () => {
