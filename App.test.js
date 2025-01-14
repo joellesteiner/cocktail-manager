@@ -1,70 +1,77 @@
 /* eslint-env jest */
+const fs = require('fs');
 const request = require('supertest');
 const express = require('express');
+const os = require('os');
+const path = require('path');
 
 const { app } = require('./server.js')
 app.use(express.json());
 
+function temporaryJSONfile() {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'drinks-temp-'));
+    const tempFilePath = path.join(tempDir, 'drinks.json');
+    fs.writeFileSync(tempFilePath,'{ "drinks": [] }', 'utf8');
+    process.env.DRINK_JSON_PATH = tempFilePath;
+}
+temporaryJSONfile();
 
-
-describe('GET /api/drinks/:id (Edge Cases)', () => {
-    it('should return 404 if the drink ID format is invalid', async () => {
-        const invalidId = 'invalid-id-format';
-
-        const response = await request(app).get(`/api/drinks/${invalidId}`);
-
-        expect(response.status).toBe(404);
-        expect(response.body).toHaveProperty('message', 'Drink not found');
-    });
-});
-
-
-describe('POST /api/drinks (Missing Required Fields)', () => {
-    it('should return 400 if required fields are missing', async () => {
-        const invalidDrink = {
-            ingredients: ['mint', 'sugar'],
-            alcoholContent: 0,
-            allergens: [],
-        };
-
-        const response = await request(app).post('/api/drinks').send(invalidDrink);
-
-        expect(response.status).toBe(400);
-        expect(response.body).toHaveProperty('message', 'Missing required fields');
-    });
-});
-
-
-describe('DELETE /api/drinks/:id (Edge Cases)', () => {
-    it('should return 404 for a non-existent or invalid drink ID', async () => {
-        const invalidId = 'invalid-id';
-
-        const response = await request(app).delete(`/api/drinks/${invalidId}`);
-
-        expect(response.status).toBe(404);
-        expect(response.body).toHaveProperty('message', 'Drink not found');
-    });
-});
-
-
-describe('GET /api/drinks (Retrieve All Drinks)', () => {
-    it('should return a list of all drinks', async () => {
-        const response = await request(app).get('/api/drinks');
-
-        expect(response.status).toBe(200);
-    });
-
-    describe('GET /api/drinks (When No Drinks Are Available)', () => {
-        it('should return an empty array when no drinks are available', async () => {
-            const response = await request(app).get('/api/drinks');
-
-            expect(response.status).toBe(200);
-            expect(response.body).toBeInstanceOf(Object);
-            expect(response.body.length).toBe(undefined);
-        });
-    });
+console.log(`Environment variable DRINK_JSON_PATH set to: ${process.env.DRINK_JSON_PATH}`);
 
     describe('GET /api/drinks/:id (Edge Cases)', () => {
+        it('should post a drink and return all drinks using the GET /api/drinks API', async () => {
+            const testDrink = {
+                name: 'My Test Drink',
+                category: 'other',
+                ingredients: ['Test Ingredients'],
+                glass: 'none',
+                alcoholContent: 0,
+                allergens: ['none'],
+            };
+
+            const postResponse = await request(app)
+                .post('/api/drinks')
+                .send(testDrink)
+                .expect(201);
+
+            expect(postResponse.body).toBeDefined();
+            expect(postResponse.body).toHaveProperty('message', 'Drink added successfully!');
+            expect(postResponse.body).toHaveProperty('id'); // Ensure an ID is returned
+
+            const getResponse = await request(app).get('/api/drinks').expect(200);
+
+            expect(getResponse.body).toBeDefined();
+            expect(getResponse.body).toHaveProperty('message', 'Drinks list retrieved successfully');
+            expect(getResponse.body).toHaveProperty('drinks');
+            expect(Array.isArray(getResponse.body.drinks)).toBe(true);
+
+            const foundDrink = getResponse.body.drinks.find((drink) => drink.name === 'My Test Drink');
+            expect(foundDrink).toBeDefined();
+            expect(foundDrink).toMatchObject({
+                name: 'My Test Drink',
+                category: 'other',
+                ingredients: ['Test Ingredients'],
+                glass: 'none',
+                alcoholContent: 0,
+                allergens: ['none'],
+            });
+
+
+        it('should return an error message when no drinks are available', async () => {
+            const getResponse = await request(app).get('/api/drinks');
+            if (getResponse.body.drinks && getResponse.body.drinks.length > 0) {
+                for (const drink of getResponse.body.drinks) {
+                    await request(app).delete(`/api/drinks/${drink.id}`).expect(200);
+                }
+            }
+
+            const emptyGetResponse = await request(app).get('/api/drinks');
+
+            expect(emptyGetResponse.status).toBe(404); // The status should be 404 for "not found"
+            expect(emptyGetResponse.body).toHaveProperty('message', 'No drinks available'); // Proper error message
+        });
+
+
         it('should return 404 if the drink ID format is invalid', async () => {
             const invalidId = 'invalid-id-format';
 
@@ -73,29 +80,32 @@ describe('GET /api/drinks (Retrieve All Drinks)', () => {
             expect(response.status).toBe(404);
             expect(response.body).toHaveProperty('message', 'Drink not found');
         });
+    });
+    });
 
-        it('should return 404 if the drink does not exist', async () => {
-            const nonExistentId = '123456';
 
-            const response = await request(app).get(`/api/drinks/${nonExistentId}`);
+    describe('POST /api/drinks (Edge Cases)', () => {
+        it('should return 400 if no data is provided in the POST request', async () => {
+            const response = await request(app).post('/api/drinks').send({});
 
-            expect(response.status).toBe(404);
-            expect(response.body).toHaveProperty('message', 'Drink not found');
+            expect(response.status).toBe(400);
+            expect(response.body).toHaveProperty('message', "Missing required fields");
         });
-    });
 
-
-    it('should return 404 if the drink ID format is invalid', async () => {
-        const invalidId = 'invalid-id-format';
-
-        const response = await request(app).get(`/api/drinks/${invalidId}`);
-
-        expect(response.status).toBe(404);
-        expect(response.body).toHaveProperty('message', 'Drink not found');
-    });
-
-    describe('POST /api/drinks (Invalid data)', () => {
         it('should return 400 if required fields are missing', async () => {
+            const invalidDrink = {
+                ingredients: ['mint', 'sugar'],
+                alcoholContent: 0,
+                allergens: [],
+            };
+
+            const response = await request(app).post('/api/drinks').send(invalidDrink);
+
+            expect(response.status).toBe(400);
+            expect(response.body).toHaveProperty('message', 'Missing required fields');
+        });
+
+        it('should return 500 if required fields are missing', async () => {
             const invalidDrink = {
                 name: 'Mocktail Without Ingredients',
                 category: 'mocktail',
@@ -110,72 +120,50 @@ describe('GET /api/drinks (Retrieve All Drinks)', () => {
             expect(response.status).toBe(500);
             expect(response.body).toHaveProperty('message', 'Error adding drink');
         });
-    });
 
-    describe('POST /api/drinks (Edge Cases)', () => {
-        it('should return 400 if no data is provided in the POST request', async () => {
-            const response = await request(app).post('/api/drinks').send({});
-
-            expect(response.status).toBe(400);
-            expect(response.body).toHaveProperty('message', "Missing required fields");
-        });
-    });
-
-
-
-        describe('PUT /api/drinks/:id (Invalid ID)', () => {
-            it('should return 404 for invalid drink ID format', async () => {
-                const response = await request(app).put('/api/drinks/invalid-id').send({
-                    name: 'New Drink',
-                    category: 'mocktail',
-                    ingredients: ['water', 'sugar'],
-                    glass: 'Glass',
-                    alcoholContent: 0,
-                    allergens: [],
-                });
-
-                expect(response.status).toBe(500);
-                expect(response.body).toHaveProperty('message', 'Error updating the drink: Drink not found.');
-            });
-        });
-
-
-        it('should return 404 if the drink ID does not exist for update', async () => {
-            const response = await request(app).put('/api/drinks/non-existing-id').send({
-                name: 'New Drink',
+        it('should successfully post a new drink', async () => {
+            const testDrink = {
+                name: 'Test Drink',
                 category: 'mocktail',
-                ingredients: ['water', 'sugar'],
-                glass: 'Glass',
+                ingredients: ['Test Ingredient 1', 'Test Ingredient 2'],
+                glass: 'highball',
                 alcoholContent: 0,
-                allergens: [],
-            });
-
-            expect(response.status).toBe(500);
-            expect(response.body).toHaveProperty('message', 'Error updating the drink: Drink not found.');
-        });
-    });
-
-    describe('PUT /api/drinks/:id (Invalid data)', () => {
-        it('should return 400 if required fields are missing', async () => {
-            const drinkId = 'Id'
-            const invalidData = {
-                name: '',
-                category: 'cocktail',
-                ingredients: ['tequila', 'lime juice'],
-                glass: 'Cocktail Glass',
-                alcoholContent: 40,
-                allergens: ['citrus'],
+                allergens: ['none'],
             };
 
-            const response = await request(app).put(`/api/drinks/${drinkId}`).send(invalidData);
+            const response = await request(app)
+                .post('/api/drinks')
+                .send(testDrink)
+                .expect(201);
 
-            expect(response.status).toBe(500);
-            expect(response.body).toHaveProperty('message', "Error updating the drink: Drink not found.");
+            expect(response.body).toBeDefined();
+            expect(response.body).toHaveProperty('message', 'Drink added successfully!');
+            expect(response.body).toHaveProperty('id');
+        });
+
+
+});
+
+    describe('DELETE /api/drinks/:id (Edge Cases)', () => {
+        it('should return 404 for a non-existent or invalid drink ID', async () => {
+            const invalidId = 'invalid-id';
+
+            const response = await request(app).delete(`/api/drinks/${invalidId}`);
+
+            expect(response.status).toBe(404);
+            expect(response.body).toHaveProperty('message', 'Drink not found');
+        });
+
+        it('should return 404 if the drink ID does not exist for deletion', async () => {
+            const response = await request(app).delete('/api/drinks/non-existing-id');
+
+            expect(response.status).toBe(404);
+            expect(response.body).toHaveProperty('message', 'Drink not found');
         });
     });
 
     describe('PUT /api/drinks/:id (Edge Cases)', () => {
-        it('should return 404 if the drink does not exist for updating', async () => {
+        it('should return 500 if the drink does not exist for updating', async () => {
             const invalidId = 'nonexistent-id';
 
             const updatedDrink = {
@@ -192,15 +180,98 @@ describe('GET /api/drinks (Retrieve All Drinks)', () => {
             expect(response.status).toBe(500);
             expect(response.body).toHaveProperty('message', 'Error updating the drink: Drink not found.');
         });
-    });
 
+        it('should return 500 for invalid drink ID format', async () => {
+            const response = await request(app).put('/api/drinks/invalid-id').send({
+                name: 'New Drink',
+                category: 'mocktail',
+                ingredients: ['water', 'sugar'],
+                glass: 'Glass',
+                alcoholContent: 0,
+                allergens: [],
+            });
 
-    describe('DELETE /api/drinks/:id', () => {
-
-        it('should return 404 if the drink ID does not exist for deletion', async () => {
-            const response = await request(app).delete('/api/drinks/non-existing-id');
-
-            expect(response.status).toBe(404);
-            expect(response.body).toHaveProperty('message', 'Drink not found');
+            expect(response.status).toBe(500);
+            expect(response.body).toHaveProperty('message', 'Error updating the drink: Drink not found.');
         });
-    })
+
+        it('should return 500 if the drink ID does not exist for update', async () => {
+            const response = await request(app).put('/api/drinks/non-existing-id').send({
+                name: 'New Drink',
+                category: 'mocktail',
+                ingredients: ['water', 'sugar'],
+                glass: 'Glass',
+                alcoholContent: 0,
+                allergens: [],
+            });
+
+            expect(response.status).toBe(500);
+            expect(response.body).toHaveProperty('message', 'Error updating the drink: Drink not found.');
+        });
+
+
+        it('should return 500 if required fields are missing', async () => {
+            const drinkId = 'Id'
+            const invalidData = {
+                name: '',
+                category: 'cocktail',
+                ingredients: ['tequila', 'lime juice'],
+                glass: 'Cocktail Glass',
+                alcoholContent: 40,
+                allergens: ['citrus'],
+            };
+
+            const response = await request(app).put(`/api/drinks/${drinkId}`).send(invalidData);
+
+            expect(response.status).toBe(500);
+            expect(response.body).toHaveProperty('message', "Error updating the drink: Drink not found.");
+        });
+        it('should post a drink and update it using the PUT /api/drinks/:id API', async () => {
+            const initialDrink = {
+                name: 'Original Drink',
+                category: 'other',
+                ingredients: ['Original Ingredients'],
+                glass: 'none',
+                alcoholContent: 5,
+                allergens: ['none'],
+            };
+
+            const postResponse = await request(app)
+                .post('/api/drinks')
+                .send(initialDrink)
+                .expect(201);
+
+            expect(postResponse.body).toBeDefined();
+            expect(postResponse.body).toHaveProperty('message', 'Drink added successfully!');
+            expect(postResponse.body).toHaveProperty('id'); // Ensure an ID is returned
+
+            const drinkId = postResponse.body.id; // Extract the ID for further operations
+
+            const updatedDrink = {
+                name: 'Updated Drink',
+                category: 'cocktail',
+                ingredients: ['Updated Ingredients'],
+                glass: 'cocktail glass',
+                alcoholContent: 10,
+                allergens: ['nuts'],
+            };
+
+            const putResponse = await request(app)
+                .put(`/api/drinks/${drinkId}`)
+                .send(updatedDrink)
+                .expect(200);
+
+            expect(putResponse.body).toBeDefined();
+            expect(putResponse.body).toHaveProperty('message', 'Drink updated successfully');
+            expect(putResponse.body).toHaveProperty('id', drinkId);
+
+            const getResponse = await request(app).get(`/api/drinks/${drinkId}`).expect(200);
+
+            expect(getResponse.body).toBeDefined();
+            expect(getResponse.body).toMatchObject({
+                id: drinkId,
+                ...updatedDrink,
+            });
+        });
+
+    });

@@ -103,7 +103,12 @@ export class CategoryManager {
 export class DrinksManager {
 
     constructor() {
-        this.filePath = path.join(__dirname, "drinks.json");
+        if (process.env.DRINK_JSON_PATH){
+            this.filePath = process.env.DRINK_JSON_PATH ;
+        }
+        else{
+            this.filePath = path.join(__dirname, "drinks.json");
+        }
         this.CategoryManager = new CategoryManager(this.filePath);
     }
 
@@ -166,7 +171,6 @@ export class DrinksManager {
 
             const existingDrink = fileData.drinks[drinkIndex];
 
-            // Check for duplicate name in the same category
             if (this.findDuplicate(updatedDrinkDetails, id)) {
                 throw new Error('A drink with this name already exists in the same category.');
             }
@@ -218,7 +222,7 @@ export class DrinksManager {
         return this.getAllDrinks().some(existingDrink =>
             existingDrink.name === updatedDrink.name &&
             existingDrink.category === updatedDrink.category &&
-            existingDrink.id !== idToExclude // Exclude the current drink being updated
+            existingDrink.id !== idToExclude
         );
     }
 }

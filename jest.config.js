@@ -1,13 +1,13 @@
 module.exports = {
     transform: {
-        "^.+\\.(js|ts|tsx)$": "babel-jest",  // Use Babel to transform JS, TS, and TSX files
+        "^.+\\.(js|ts|tsx)$": "babel-jest",
     },
-    testEnvironment: "node",  // Set the test environment to Node.js for backend code
+    testEnvironment: "node",
     globals: {
         'ts-jest': {
-            useBabelrc: true, // Let ts-jest use the Babel config if using TypeScript
+            useBabelrc: true,
         },
     },
-    moduleFileExtensions: ["js", "json", "node"], // To make sure the extensions are recognized
+    moduleFileExtensions: ["js", "json", "node"],
 };
 

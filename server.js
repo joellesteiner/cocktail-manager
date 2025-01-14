@@ -4,7 +4,6 @@ const fs = require('fs');
 const { Drink, CategoryManager, DrinksManager } = require('./frontend/src/drinkForm.js');
 const { v4: uuidv4 } = require('uuid');
 const cors = require('cors');
-const filePath = path.join(__dirname, 'frontend', 'src', 'drinks.json');
 
 
 const app = express();
@@ -20,24 +19,21 @@ app.use((req, res, next) => {
     next();
 });
 
-// Utility: Read JSON file
 const readJSONFile = (filePath) => {
     try {
-        // Correct file path
         const data = fs.readFileSync(filePath, 'utf8');
         if (!data) {
-            console.warn('File is empty, initializing with default structure.');
+            console.warn('File is empty, initialising with default structure.');
             return { drinks: [] };
         }
         return JSON.parse(data);
     } catch (error) {
         console.error('Error reading or parsing JSON file:', error.message);
-        console.warn('Reinitializing file with default structure.');
+        console.warn('Reinitialising file with default structure.');
         return { drinks: [] };
     }
 };
 
-// Utility: Validate drink fields
 const validateDrinkFields = (fields) => {
     const { name, category, ingredients, glass, alcoholContent, allergens } = fields;
     if (!name || !category || !ingredients || !glass || alcoholContent === undefined || allergens === undefined) {
@@ -86,11 +82,11 @@ app.get('/api/drinks/category/:category', (req, res) => {
 
 app.get('/api/drinks/:id', (req, res) => {
     const id = req.params.id;
-    const filePath = path.join(__dirname, 'drinks.json');
 
+    const drinksManager = new DrinksManager();
+    const allDrinks = drinksManager.getAllDrinks();
     try {
-        const myData = readJSONFile(filePath);
-        const drink = myData.drinks.find(drink => drink.id === id);
+        const drink = allDrinks.find(drink => drink.id === id);
 
         if (!drink) {
             return res.status(404).json({ message: 'Drink not found' });
