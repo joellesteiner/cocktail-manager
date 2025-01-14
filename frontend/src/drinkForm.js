@@ -6,7 +6,6 @@ import {readFileSync, writeFileSync} from "node:fs";
 export class Drink {
 
     constructor(name, category, ingredients, glass, alcoholContent = null, allergens = []) {
-        this.name = name.trim().toLowerCase();
         if (typeof category !== 'string') {
             throw new Error("Category must be a string");
         }
