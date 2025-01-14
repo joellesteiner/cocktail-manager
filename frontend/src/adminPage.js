@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import DrinkList from './DrinkList.js';
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 import './App.css';
 
 const AdminPage = ({ goToHome, fetchDrinks, setDrinks, drinks }) => {
+    // Form state
     const [drinkName, setDrinkName] = useState('');
     const [category, setCategory] = useState('');
     const [ingredients, setIngredients] = useState('');
@@ -16,20 +17,22 @@ const AdminPage = ({ goToHome, fetchDrinks, setDrinks, drinks }) => {
 
     const categories = ['cocktail', 'mocktail', 'other'];
 
-    // Calculate data for Pie Chart
+    // Prepare category data for pie chart
     const getCategoryData = () => {
         const categoryCount = categories.map((cat) => ({
             name: cat,
             value: drinks.filter((drink) => drink.category === cat).length,
         }));
-        return categoryCount.filter((data) => data.value > 0); // Exclude empty categories
+        return categoryCount.filter((data) => data.value > 0);
     };
 
-    const pieColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']; // Define colors for categories
+    const pieColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']; // Colors for pie segments
 
+    // Handle form submit (add or update drink)
     const handleSubmit = async (event) => {
         event.preventDefault();
 
+        // Validate form input
         if (!drinkName.trim() || !category.trim() || !ingredients.trim() || !glass.trim()) {
             alert('All fields are required.');
             return;
@@ -45,27 +48,30 @@ const AdminPage = ({ goToHome, fetchDrinks, setDrinks, drinks }) => {
         };
 
         try {
+            // Update or add drink
             if (editMode && currentDrink) {
                 await axios.put(`http://localhost:3001/api/drinks/${currentDrink.id}`, drinkData);
             } else {
                 await axios.post('http://localhost:3001/api/drinks', drinkData);
             }
-            await fetchDrinks();
-            clearForm();
+            await fetchDrinks(); // Refresh the drink list
+            clearForm(); // Reset form
         } catch (error) {
             console.error('Error saving drink:', error.response?.data || error.message);
         }
     };
 
+    // Handle drink deletion
     const handleDelete = async (id) => {
         try {
             await axios.delete(`http://localhost:3001/api/drinks/${id}`);
-            setDrinks((prevDrinks) => prevDrinks.filter((drink) => drink.id !== id));
+            setDrinks((prevDrinks) => prevDrinks.filter((drink) => drink.id !== id)); // Remove from state
         } catch (error) {
             console.error('Error deleting drink:', error.message);
         }
     };
 
+    // Set form fields for editing a drink
     const handleEdit = (drink) => {
         setDrinkName(drink.name);
         setCategory(drink.category);
@@ -73,11 +79,11 @@ const AdminPage = ({ goToHome, fetchDrinks, setDrinks, drinks }) => {
         setGlass(drink.glass);
         setAlcoholContent(drink.alcoholContent.toString());
         setAllergens(drink.allergens.join(', '));
-        setEditMode(true);
-        setCurrentDrink(drink);
-        console.log(drink)
+        setEditMode(true); // Switch to edit mode
+        setCurrentDrink(drink); // Set current drink for update
     };
 
+    // Clear form fields
     const clearForm = () => {
         setDrinkName('');
         setCategory('');
@@ -143,6 +149,7 @@ const AdminPage = ({ goToHome, fetchDrinks, setDrinks, drinks }) => {
                 <button type="submit">{editMode ? 'Update Drink' : 'Add Drink'}</button>
             </form>
 
+            {/* Drink list */}
             <DrinkList
                 drinks={drinks}
                 onDelete={handleDelete}
@@ -151,6 +158,7 @@ const AdminPage = ({ goToHome, fetchDrinks, setDrinks, drinks }) => {
                 currentCategory={category}
             />
 
+            {/* Pie chart showing drink category distribution */}
             <div style={{ marginTop: '30px' }}>
                 <h2>Drink Categories Distribution</h2>
                 <PieChart width={400} height={300}>

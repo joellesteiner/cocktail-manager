@@ -15,7 +15,6 @@ body {
     border-radius: 10px;
 }
 
-/* Drink Manager Header */
 h1 {
     font-size: 2rem;
     text-align: center;
@@ -65,7 +64,6 @@ form button:hover {
     background-color: #0056b3;
 }
 
-/* Drinks List Styling */
 .drink-list {
     margin-top: 20px;
 }
@@ -116,9 +114,8 @@ form button:hover {
     width: 25%;
 }
 
-/* Buttons inside Drink Items */
 .edit-button {
-    background-color: #17a2b8; /* Blue for edit */
+    background-color: #17a2b8;
     margin-right: 10px;
 }
 
@@ -127,7 +124,7 @@ form button:hover {
 }
 
 .delete-button {
-    background-color: #dc3545; /* Red for delete */
+    background-color: #dc3545;
 }
 
 .delete-button:hover {
@@ -183,12 +180,12 @@ ul {
 .button-group {
     display: flex;
     gap: 10px;
-    width: 100%; /* Ensures buttons stretch across available space */
+    width: 100%;
     justify-content: flex-end;
 }
 
 .edit-button {
-    background-color: #4CAF50; /* Green for edit */
+    background-color: #4CAF50;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -201,7 +198,7 @@ ul {
 }
 
 .delete-button {
-    background-color: #f44336; /* Red for delete */
+    background-color: #f44336;
     color: white;
     border: none;
     padding: 10px 20px;
