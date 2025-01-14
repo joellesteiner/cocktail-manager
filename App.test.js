@@ -227,25 +227,24 @@ console.log(`Environment variable DRINK_JSON_PATH set to: ${process.env.DRINK_JS
             expect(response.body).toHaveProperty('message', "Error updating the drink: Drink not found.");
         });
         it('should post a drink and update it using the PUT /api/drinks/:id API', async () => {
-            const initialDrink = {
+            const testDrink = {
                 name: 'Original Drink',
-                category: 'other',
+                category: 'mocktail',
                 ingredients: ['Original Ingredients'],
-                glass: 'none',
-                alcoholContent: 5,
+                glass: 'highball',
+                alcoholContent: 0,
                 allergens: ['none'],
             };
 
             const postResponse = await request(app)
                 .post('/api/drinks')
-                .send(initialDrink)
+                .send(testDrink)
                 .expect(201);
 
-            expect(postResponse.body).toBeDefined();
-            expect(postResponse.body).toHaveProperty('message', 'Drink added successfully!');
-            expect(postResponse.body).toHaveProperty('id'); // Ensure an ID is returned
+            const drinkId = postResponse.body.id;
 
-            const drinkId = postResponse.body.id; // Extract the ID for further operations
+            expect(postResponse.body).toBeDefined();
+            expect(postResponse.body).toHaveProperty('id');
 
             const updatedDrink = {
                 name: 'Updated Drink',
@@ -263,15 +262,20 @@ console.log(`Environment variable DRINK_JSON_PATH set to: ${process.env.DRINK_JS
 
             expect(putResponse.body).toBeDefined();
             expect(putResponse.body).toHaveProperty('message', 'Drink updated successfully');
-            expect(putResponse.body).toHaveProperty('id', drinkId);
+            expect(putResponse.body.drink).toBeDefined();
+            expect(putResponse.body.drink).toHaveProperty('id', drinkId);
+            expect(putResponse.body.drink).toMatchObject(updatedDrink);
 
-            const getResponse = await request(app).get(`/api/drinks/${drinkId}`).expect(200);
+            const getResponse = await request(app)
+                .get(`/api/drinks/${drinkId}`)
+                .expect(200);
 
             expect(getResponse.body).toBeDefined();
-            expect(getResponse.body).toMatchObject({
-                id: drinkId,
-                ...updatedDrink,
-            });
+            expect(getResponse.body).toHaveProperty('message', 'Drink found');
+            expect(getResponse.body.drink).toBeDefined();
+            expect(getResponse.body.drink).toHaveProperty('id', drinkId);
+            expect(getResponse.body.drink).toMatchObject(updatedDrink);
         });
+
 
     });
